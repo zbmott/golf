@@ -7,14 +7,14 @@ from pygame.sprite import Group
 
 from src.models import Hole
 from src.sprites import *
-from src.utils import Point
+from src.utils import colors, Point
 
 
 Hole2 = Hole(
     'Hole #2',
     par=3,
     noncollidibles=Group(
-        Text(Point(1020, 125), 'Par 3', font.Font(None, 30), (230, 230, 230)),
+        Text(Point(1020, 125), 'Par 3', font.Font(None, 30), colors.WHITE),
     ),
     collidibles=Group(
         Green(Point(150, 75), 850, 125),

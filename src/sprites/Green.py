@@ -2,11 +2,10 @@
 
 __author__ = 'zmott@nerdery.com'
 
+from src.utils.colors import GREEN
 from .FrictionalSurface import FrictionalSurface
 
 
 class Green(FrictionalSurface):
-    GREEN = (0, 100, 0)
-
     def __init__(self, point, width, height, *groups):
-        super().__init__(point, width, height, self.GREEN, 0.98, *groups)
+        super().__init__(point, width, height, GREEN, 0.98, *groups)
