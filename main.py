@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# vim: ts=4:sw=4:expandtabs
+
+__author__ = 'zmott@nerdery.com'
+
 
 import sys
 import pygame
@@ -18,14 +22,20 @@ def main():
 
     background = pygame.display.set_mode((640, 480), pygame.RESIZABLE)
 
-    walls = pygame.sprite.Group()
     all = pygame.sprite.RenderUpdates()
+    collidibles = pygame.sprite.Group()
+    walls = pygame.sprite.Group()
+    holes = pygame.sprite.Group()
 
-    ball = GolfBall(320, 240, [all])
-    Wall(Point(30, 30), Point(610, 45), 3, [all, walls])
-    Wall(Point(610, 45), Point(595, 465), 3, [all, walls])
-    Wall(Point(595, 465), Point(45, 450), 3, [all, walls])
-    Wall(Point(45, 450), Point(30, 30), 3, [all, walls])
+    # Sprites are rendered in the order they're declared here.
+    Hole(Point(550, 400), [all, collidibles, holes])
+
+    ball = GolfBall(Point(320, 240), [all])
+
+    Wall(Point(30, 30), Point(610, 45), 3, [all, collidibles, walls])
+    Wall(Point(610, 45), Point(595, 465), 3, [all, collidibles, walls])
+    Wall(Point(595, 465), Point(45, 450), 3, [all, collidibles, walls])
+    Wall(Point(45, 450), Point(30, 30), 3, [all, collidibles, walls])
 
     while True:
         keystate = None
@@ -46,13 +56,14 @@ def main():
         if keystate == 115:  # 's'
             ball.stop()
 
-        collisions = ball.collidewall(walls)
+        collisions = ball.collide(collidibles)
         for collision in collisions:
-            ball.velocity.reflect_ip(collision.reflect_vector)
+            collision.handle_collision(ball)
 
         all.clear(screen, background)
         screen.fill((0, 100, 0))
         all.update()
+        dirty = all.draw(screen)
 
         # Visualize the ball's current velocity
         if ball.velocity:
@@ -85,7 +96,6 @@ def main():
                 3
             )
 
-        dirty = all.draw(screen)
         pygame.display.update(dirty)
 
         clock.tick(33)  # Framerate capped at ~30 FPS

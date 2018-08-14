@@ -1,14 +1,18 @@
+# vim: ts=4:sw=4:expandtabs
+
+__author__ = 'zmott@nerdery.com'
+
 from os import path
 
-from pygame import image, math
-from pygame.sprite import DirtySprite
+from pygame import math, Rect
 
 from src.utils import Point
+from .ImageSprite import ImageSprite
 
 
-class GolfBall(DirtySprite):
+class GolfBall(ImageSprite):
     RADIUS = 10
-    GOLFBALL_PATH = path.join(
+    IMAGE_PATH = path.join(
         path.dirname(path.dirname(path.dirname(__file__))),
         'assets',
         'golfball_20x20.png'
@@ -17,40 +21,41 @@ class GolfBall(DirtySprite):
     MAX_SPEED_SQUARED = MAX_SPEED**2
     STRIKE_SCALE_FACTOR = 8
 
-    def __init__(self, x, y, *groups):
+    def __init__(self, point, *groups):
         super().__init__(*groups)
 
         self.velocity = math.Vector2(0, 0)
 
-        self.image = image.load(self.GOLFBALL_PATH)
-        self.image.convert_alpha()
+        self.logical_position = Point(point.x - self.RADIUS, point.y - self.RADIUS)
 
-        self.rect = self.image.get_rect()
-        self.logical_position = Point(x - self.RADIUS, y - self.RADIUS)
-        
         self.rect.x = self.logical_position.x
         self.rect.y = self.logical_position.y
 
-        self.in_contact_with_wall = False
+        self.colliding = False
 
     @property
     def center(self):
         return Point(
-            int(self.logical_position.x + (self.rect.width / 2.0)),
-            int(self.logical_position.y + (self.rect.height / 2.0))
+            int(self.logical_position.x + self.RADIUS),
+            int(self.logical_position.y + self.RADIUS)
         )
 
     def update(self):
         self.logical_position.x += self.velocity.x
         self.logical_position.y += self.velocity.y
 
-        self.set_pos(int(self.logical_position.x), int(self.logical_position.y))
+        # Update the ball's physical position to match the pixels
+        # nearest its logical position.
+        self.rect.x = int(self.logical_position.x)
+        self.rect.y = int(self.logical_position.y)
 
         self.dirty = 1
 
-    def set_pos(self, x, y):
-        self.rect.x = x
-        self.rect.y = y
+    def set_logical_pos(self, point):
+        self.logical_position = point
+
+    def center_on(self, point):
+        self.set_logical_pos(Point(point.x - self.RADIUS, point.y - self.RADIUS))
 
     def strike(self, x, y):
         self.velocity = math.Vector2(
@@ -65,17 +70,17 @@ class GolfBall(DirtySprite):
         self.velocity.x = 0
         self.velocity.y = 0
 
-    def collidewall(self, walls):
+    def collide(self, collidibles):
         collisions = []
-        initial_contact_state = self.in_contact_with_wall
+        initial_collision_state = self.colliding
 
-        for wall in walls.sprites():
-            if self.rect.collidelist(wall.rects) != -1:
-                self.in_contact_with_wall = True
-                collisions.append(wall)
+        for collidible in collidibles.sprites():
+            if self.rect.collidelist(collidible.collision_rects) != -1:
+                self.colliding = True
+                collisions.append(collidible)
 
-        if not initial_contact_state and collisions:
+        if not initial_collision_state and collisions:
             return collisions
 
-        self.in_contact_with_wall = False
+        self.colliding = False
         return []
