@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import draw, math, Rect, Surface
+from pygame import draw, math, Rect, sprite, Surface
 from pygame.sprite import DirtySprite
 
 from src.utils import Point
@@ -17,7 +17,6 @@ class Wall(DirtySprite, Collidible):
         super().__init__(*groups)
 
         self.width = width
-        self.dirty = 1
 
         # This sprite's origin on the application's screen.
         # Necessary to draw the sprite correctly, as well as to calculate
@@ -69,5 +68,12 @@ class Wall(DirtySprite, Collidible):
             self.width
         )
 
-    def handle_collision(self, other):
-        other.velocity.reflect_ip(self.reflect_vector)
+    def handle_collision(self, ball):
+        ball.velocity.reflect_ip(self.reflect_vector)
+        normalized = ball.velocity.normalize()
+
+        while ball.rect.collidelist(self.collision_rects) != -1:
+            new_pos = ball.logical_position + normalized
+            ball.set_logical_pos(new_pos)
+            ball.rect.x = new_pos.x
+            ball.rect.y = new_pos.y

@@ -4,7 +4,7 @@ __author__ = 'zmott@nerdery.com'
 
 from os import path
 
-from pygame import math, Rect
+from pygame import math
 
 from src.utils import Point
 from .ImageSprite import ImageSprite
@@ -17,9 +17,9 @@ class GolfBall(ImageSprite):
         'assets',
         'golfball_20x20.png'
     )
-    MAX_SPEED = 12
+    MAX_SPEED = 15
     MAX_SPEED_SQUARED = MAX_SPEED**2
-    STRIKE_SCALE_FACTOR = 8
+    STRIKE_SCALE_FACTOR = 5
 
     def __init__(self, point, *groups):
         super().__init__(*groups)

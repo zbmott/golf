@@ -5,18 +5,19 @@ __author__ = 'zmott@nerdery.com'
 
 from os import path
 
-from pygame import Rect
+import pygame
+from pygame import event, Rect
 
 from src.utils import Point
 from .Collidible import Collidible
 from .ImageSprite import ImageSprite
 
 
-class Hole(ImageSprite, Collidible):
+class Pin(ImageSprite, Collidible):
     IMAGE_PATH = path.join(
         path.dirname(path.dirname(path.dirname(__file__))),
         'assets',
-        'hole_25x25.png',
+        'pin_25x25.png',
     )
     SINK_THRESHOLD = 9
 
@@ -43,3 +44,5 @@ class Hole(ImageSprite, Collidible):
         if other.velocity.length_squared() <= self.SINK_THRESHOLD:
             other.stop()
             other.center_on(self.center)
+
+            event.post(event.Event(pygame.USEREVENT, code='hole_complete'))

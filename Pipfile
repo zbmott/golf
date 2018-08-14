@@ -8,6 +8,7 @@ name = "pypi"
 [packages]
 pygame = "*"
 ipython = "*"
+transitions = "*"
 
 [requires]
 python_version = "3.7"
