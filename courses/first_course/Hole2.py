@@ -2,6 +2,7 @@
 
 __author__ = 'zmott@nerdery.com'
 
+from pygame import font
 from pygame.sprite import Group
 
 from src.models import Hole
@@ -11,7 +12,10 @@ from src.utils import Point
 
 Hole2 = Hole(
     'Hole #2',
-    par=4,
+    par=3,
+    noncollidibles=Group(
+        Text(Point(1020, 125), 'Par 3', font.Font(None, 30), (230, 230, 230)),
+    ),
     collidibles=Group(
         Green(Point(150, 75), 850, 125),
         Green(Point(150, 200), 150, 500),

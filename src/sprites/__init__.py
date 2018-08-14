@@ -12,7 +12,8 @@ __all__ = [
     'ImageSprite',
     'Rough',
     'Sand',
-    'Wall'
+    'Text',
+    'Wall',
 ]
 
 from .Collidible import Collidible
@@ -23,4 +24,5 @@ from .Pin import Pin
 from .ImageSprite import ImageSprite
 from .Rough import Rough
 from .Sand import Sand
+from .Text import Text
 from .Wall import Wall

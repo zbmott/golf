@@ -14,17 +14,23 @@ from transitions import Machine
 from src.utils import Point
 
 
+class Quit(Exception):
+    pass
+
+
 class Golf(object):
     STATES = [
         'home',
         'hole',
         'score',
+        'quit',
     ]
 
     TRANSITIONS = [
         {'trigger': 'start_game', 'source': 'home', 'dest': 'hole'},
         {'trigger': 'next_hole', 'source': 'hole', 'dest': 'hole', 'before': 'load_hole'},
         {'trigger': 'end_game', 'source': 'hole', 'dest': 'score'},
+        {'trigger': 'quit', 'source': '*', 'dest': 'quit'},
     ]
 
     def __init__(self, screen, course):
@@ -40,12 +46,14 @@ class Golf(object):
         self.clock = None
 
         self.course = course
-        self.hole = next(course)
+        self.holes = course.holes
+        self.iterable_holes = (hole for hole in self.holes)
+        self.current_hole = next(self.iterable_holes)
 
     def handle_home_tick(self):
         for event in pygame.event.get():
             if event.type in [pygame.QUIT]:
-                pygame.quit()
+                self.quit()
             elif event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                 self.start_game()
 
@@ -70,18 +78,18 @@ class Golf(object):
         pygame.display.update()
 
     def load_hole(self):
-        self.hole = next(self.course)
+        self.current_hole = next(self.iterable_holes)
 
     def handle_hole_tick(self):
         keystate = None
 
-        all = self.hole.groups['all']
-        ball = self.hole.groups['ball'].sprites()[0]
-        collidibles = self.hole.groups['collidibles']
+        all = self.current_hole.groups['all']
+        ball = self.current_hole.groups['ball'].sprites()[0]
+        collidibles = self.current_hole.groups['collidibles']
 
         for event in pygame.event.get():
             if event.type in [pygame.QUIT]:
-                pygame.quit()
+                self.quit()
             elif event.type in [pygame.USEREVENT]:
                 if event.code == 'hole_complete':
                     try:
@@ -141,7 +149,11 @@ class Golf(object):
         pygame.display.update(dirty)
 
     def handle_score_tick(self):
+        self.quit()
+
+    def handle_quit_tick(self):
         pygame.quit()
+        raise Quit()
 
     def __call__(self):
         self.clock = pygame.time.Clock()
@@ -151,7 +163,7 @@ class Golf(object):
 
             try:
                 state_handler()
-            except pygame.error:
+            except (Quit, pygame.error):
                 return 0
 
             self.clock.tick(60)  # Framerate capped at 60 FPS

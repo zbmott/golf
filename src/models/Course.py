@@ -10,10 +10,8 @@ class Course(object):
     """
     def __init__(self, name, holes):
         self.name = name
-        self.holes = iter(holes)
+        self.holes = holes
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return next(self.holes)
+    @property
+    def total_par(self):
+        return sum([h.score for h in self.holes])
