@@ -2,7 +2,7 @@
 Golf is a bad Python implementation of minigolf. 
 Part of the fun is that it's not very good and weird things happen.
 
-## Installation
+## Installation and Usage
 1. Clone the repository.
 2. Install the dependencies:
 ```
