@@ -45,6 +45,8 @@ class Golf(object):
         self.clock = None
 
         self.course = course
+        self.course.load()
+
         self.holes = course.holes
         self.iterable_holes = (hole for hole in self.holes)
         self.current_hole = None

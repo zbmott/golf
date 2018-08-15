@@ -5,12 +5,12 @@ __author__ = 'zmott@nerdery.com'
 from pygame import font
 from pygame.sprite import Group
 
-from src.models import Hole
+from src.models import Hole as BaseHole
 from src.sprites import *
 from src.utils import colors, Point
 
 
-Hole2 = Hole(
+Hole = BaseHole(
     'Hole #2',
     par=3,
     origin=Point(100, 100),
