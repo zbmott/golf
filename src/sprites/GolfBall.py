@@ -19,7 +19,7 @@ class GolfBall(ImageSprite):
     )
     MAX_SPEED = 15
     MAX_SPEED_SQUARED = MAX_SPEED**2
-    STRIKE_SCALE_FACTOR = 5
+    STRIKE_SCALE_FACTOR = 7.5
 
     def __init__(self, point, *groups):
         super().__init__(*groups)
@@ -30,8 +30,6 @@ class GolfBall(ImageSprite):
 
         self.rect.x = self.logical_position.x
         self.rect.y = self.logical_position.y
-
-        self.colliding = False
 
     @property
     def center(self):
@@ -72,15 +70,9 @@ class GolfBall(ImageSprite):
 
     def collide(self, collidibles):
         collisions = []
-        initial_collision_state = self.colliding
 
         for collidible in collidibles.sprites():
             if self.rect.collidelist(collidible.collision_rects) != -1:
-                self.colliding = True
                 collisions.append(collidible)
 
-        if not initial_collision_state and collisions:
-            return collisions
-
-        self.colliding = False
-        return []
+        return collisions

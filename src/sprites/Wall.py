@@ -70,10 +70,3 @@ class Wall(DirtySprite, Collidible):
 
     def handle_collision(self, ball):
         ball.velocity.reflect_ip(self.reflect_vector)
-        normalized = ball.velocity.normalize()
-
-        while ball.rect.collidelist(self.collision_rects) != -1:
-            new_pos = ball.logical_position + normalized
-            ball.set_logical_pos(new_pos)
-            ball.rect.x = new_pos.x
-            ball.rect.y = new_pos.y

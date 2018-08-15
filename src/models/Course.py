@@ -14,4 +14,4 @@ class Course(object):
 
     @property
     def total_par(self):
-        return sum([h.score for h in self.holes])
+        return sum([h.par for h in self.holes])

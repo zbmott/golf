@@ -22,12 +22,12 @@ Hole2 = Hole(
         Sand(Point(375, 200), 625, 75),
         Rough(Point(300, 200), 75, 500),
 
-        Wall(Point(150, 75), Point(1000, 75), 3),
-        Wall(Point(1000, 75), Point(1000, 275), 3),
+        Wall(Point(150, 75), Point(1000, 75), 5),
+        Wall(Point(1000, 75), Point(1000, 275), 5),
         Wall(Point(375, 275), Point(1000, 275), 5),
         Wall(Point(375, 275), Point(375, 700), 5),
-        Wall(Point(150, 700), Point(375, 700), 3),
-        Wall(Point(150, 75), Point(150, 700), 3),
+        Wall(Point(150, 700), Point(375, 700), 5),
+        Wall(Point(150, 75), Point(150, 700), 5),
 
         Pin(Point(950, 125)),
     ),

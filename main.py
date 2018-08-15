@@ -53,13 +53,18 @@ class Golf(object):
         self.scores = []
 
     def handle_home_tick(self):
+        """
+        Describes how to draw the home screen. Basically all we do is render
+        some text and wait for the user to press a key or click the mouse,
+        at which point we start the game.
+        """
         for event in pygame.event.get():
             if event.type in [pygame.QUIT]:
                 self.quit()
             elif event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                 self.next_hole()
 
-        screen.fill((50, 50, 50))
+        screen.fill(colors.DARKGRAY)
 
         font1 = pygame.font.Font(None, 112)
         line1 = 'Golf'
@@ -80,15 +85,24 @@ class Golf(object):
         pygame.display.update()
 
     def load_hole(self):
+        """
+        Record the current score, stop tracking the current hole's sprites,
+        and advance to the next hole.
+        """
         if self.current_hole is not None:
             self.scores.append(self.current_score)
             self.current_score = 0
 
+            for group in self.current_hole.groups.values():
+                group.empty()
+
         self.current_hole = next(self.iterable_holes)
 
     def handle_hole_tick(self):
-        keystate = None
-
+        """
+        Handle draw updates while playing an actual hole. Check for events,
+        check for collisions, then update the game state and redraw the screen.
+        """
         all = self.current_hole.groups['all']
         ball = self.current_hole.groups['ball'].sprites()[0]
         collidibles = self.current_hole.groups['collidibles']
@@ -111,7 +125,7 @@ class Golf(object):
         for collision in collisions:
             collision.handle_collision(ball)
 
-        self.screen.fill((50, 50, 50))
+        self.screen.fill(colors.DARKGRAY)
         all.update()
         dirty = all.draw(self.screen)
 
@@ -131,6 +145,9 @@ class Golf(object):
         pygame.display.update(dirty)
 
     def _draw_scores(self, size):
+        """
+        Draw the scorecard onto a new Surface and return it.
+        """
         surface = pygame.Surface((1000, 2 * (size + 5)))
         surface.set_colorkey(colors.BLACK)
 
@@ -154,15 +171,15 @@ class Golf(object):
             (3, par_height + 10)
         )
 
-        for idx, h in enumerate(self.holes):
-            par = str(h.par)
-            try:
-                if idx == len(self.scores):
-                    score = str(self.current_score)
-                else:
-                    score = str(self.scores[idx])
-            except IndexError:
-                score = '-'
+        pars = [h.par for h in self.holes] + [self.course.total_par]
+
+        scores = self.scores + [self.current_score]
+        scores += '-' * (len(pars) - len(scores) - 1)
+        scores += [self.current_score + sum(self.scores)]
+
+        for idx, par in enumerate(pars):
+            par = str(par)
+            score = str(scores[idx])
 
             x = (idx + 2) * par_width
 
@@ -183,6 +200,9 @@ class Golf(object):
         return surface
 
     def _visualize_vector(self, ball, surface):
+        """
+        Draw a line that visualizes ball's current velocity.
+        """
         draw.line(
             surface,
             (255, 0, 0),
@@ -193,6 +213,9 @@ class Golf(object):
         )
 
     def _draw_pointer(self, ball, surface):
+        """
+        Draw a line that visualizes strike direction and power.
+        """
         mouse_pos = Point(*mouse.get_pos())
         mouse_vec = math.Vector2(
             mouse_pos.x - ball.center.x,
@@ -212,7 +235,44 @@ class Golf(object):
         )
 
     def handle_score_tick(self):
-        self.quit()
+        """
+        Draw the final score, then quit on user interaction.
+        """
+        for event in pygame.event.get():
+            if event.type in [pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
+                self.quit()
+
+        screen.fill(colors.DARKGRAY)
+
+        font = pygame.font.Font(None, 50)
+        par = "Par: {par}".format(par=self.course.total_par)
+        score = "Score: {score}".format(score=sum(self.scores))
+
+        width, height = font.size(score)
+        self.screen.blit(
+            font.render(score, True, colors.WHITE),
+            (640 - (width // 2), 200)
+        )
+
+        width, _ = font.size(par)
+        self.screen.blit(
+            font.render(par, True, colors.WHITE),
+            (640 - (width // 2), 215 + height)
+        )
+
+        font = pygame.font.Font(None, 30)
+        width, _ = font.size('Press any key to quit...')
+        self.screen.blit(
+            font.render('Press any key to quit...', True, colors.WHITE),
+            (640 - (width // 2), 230 + 5*height)
+        )
+
+        self.screen.blit(
+            self._draw_scores(30),
+            (150, 900)
+        )
+
+        pygame.display.update()
 
     def handle_quit_tick(self):
         pygame.quit()
