@@ -89,24 +89,14 @@ class Golf(object):
         Record the current score, stop tracking the current hole's sprites,
         and advance to the next hole.
         """
-        if self.current_hole is not None:
-            self.scores.append(self.current_score)
-            self.current_score = 0
-
-            for group in self.current_hole.groups.values():
-                group.empty()
-
         self.current_hole = next(self.iterable_holes)
+        self.current_hole.score = 0
 
     def handle_hole_tick(self):
         """
         Handle draw updates while playing an actual hole. Check for events,
         check for collisions, then update the game state and redraw the screen.
         """
-        all = self.current_hole.groups['all']
-        ball = self.current_hole.groups['ball'].sprites()[0]
-        collidibles = self.current_hole.groups['collidibles']
-
         for event in pygame.event.get():
             if event.type in [pygame.QUIT]:
                 self.quit()
@@ -116,33 +106,22 @@ class Golf(object):
                         self.next_hole()
                     except StopIteration:
                         self.end_game()
-            elif event.type in [pygame.MOUSEBUTTONDOWN]:
-                if event.button == 1:  # Left click
-                    ball.strike(*event.pos)
-                    self.current_score += 1
-
-        collisions = ball.collide(collidibles)
-        for collision in collisions:
-            collision.handle_collision(ball)
+            else:
+                self.current_hole.handle_event(event)
 
         self.screen.fill(colors.DARKGRAY)
-        all.update()
-        dirty = all.draw(self.screen)
+        self.current_hole.update()
+        self.screen.blit(
+            self.current_hole.draw(),
+            (self.current_hole.origin.x, self.current_hole.origin.y)
+        )
 
         self.screen.blit(
             self._draw_scores(30),
             (150, 900)
         )
 
-        # Visualize the ball's current velocity
-        if ball.velocity:
-            self._visualize_vector(ball, self.screen)
-
-        # Draw line from mouse pointer to ball
-        if ball.velocity.length_squared() == 0:
-            self._draw_pointer(ball, self.screen)
-
-        pygame.display.update(dirty)
+        pygame.display.update()
 
     def _draw_scores(self, size):
         """
@@ -172,14 +151,11 @@ class Golf(object):
         )
 
         pars = [h.par for h in self.holes] + [self.course.total_par]
-
-        scores = self.scores + [self.current_score]
-        scores += '-' * (len(pars) - len(scores) - 1)
-        scores += [self.current_score + sum(self.scores)]
+        scores = [h.score for h in self.holes] + [self.course.total_score]
 
         for idx, par in enumerate(pars):
             par = str(par)
-            score = str(scores[idx])
+            score = str(scores[idx]) if scores[idx] != -1 else '-'
 
             x = (idx + 2) * par_width
 
@@ -199,41 +175,6 @@ class Golf(object):
 
         return surface
 
-    def _visualize_vector(self, ball, surface):
-        """
-        Draw a line that visualizes ball's current velocity.
-        """
-        draw.line(
-            surface,
-            (255, 0, 0),
-            (ball.center.x, ball.center.y),
-            (ball.center.x + int(ball.STRIKE_SCALE_FACTOR * ball.velocity.x),
-             ball.center.y + int(ball.STRIKE_SCALE_FACTOR * ball.velocity.y)),
-            3
-        )
-
-    def _draw_pointer(self, ball, surface):
-        """
-        Draw a line that visualizes strike direction and power.
-        """
-        mouse_pos = Point(*mouse.get_pos())
-        mouse_vec = math.Vector2(
-            mouse_pos.x - ball.center.x,
-            mouse_pos.y - ball.center.y
-        )
-
-        if mouse_vec.length_squared() >= (ball.MAX_SPEED * ball.STRIKE_SCALE_FACTOR) ** 2:
-            mouse_vec.scale_to_length(ball.MAX_SPEED * ball.STRIKE_SCALE_FACTOR)
-
-        draw.line(
-            surface,
-            (0, 0, 255),
-            (ball.center.x, ball.center.y),
-            (int(ball.center.x - mouse_vec.x),
-             int(ball.center.y - mouse_vec.y)),
-            3
-        )
-
     def handle_score_tick(self):
         """
         Draw the final score, then quit on user interaction.
@@ -246,7 +187,7 @@ class Golf(object):
 
         font = pygame.font.Font(None, 50)
         par = "Par: {par}".format(par=self.course.total_par)
-        score = "Score: {score}".format(score=sum(self.scores))
+        score = "Score: {score}".format(score=self.course.total_score)
 
         width, height = font.size(score)
         self.screen.blit(

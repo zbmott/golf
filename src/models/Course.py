@@ -15,3 +15,7 @@ class Course(object):
     @property
     def total_par(self):
         return sum([h.par for h in self.holes])
+
+    @property
+    def total_score(self):
+        return sum([h.score for h in self.holes if h.score > -1])

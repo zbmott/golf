@@ -13,25 +13,26 @@ from src.utils import colors, Point
 Hole2 = Hole(
     'Hole #2',
     par=3,
+    origin=Point(100, 100),
     noncollidibles=Group(
-        Text(Point(1020, 125), 'Par 3', font.Font(None, 30), colors.WHITE),
+        Text(Point(880, 50), 'Par 3', font.Font(None, 30), colors.WHITE),
     ),
     collidibles=Group(
-        Green(Point(150, 75), 850, 125),
-        Green(Point(150, 200), 150, 500),
-        Sand(Point(375, 200), 625, 75),
-        Rough(Point(300, 200), 75, 500),
+        Green(Point(0, 0), 850, 125),
+        Green(Point(0, 125), 150, 500),
+        Sand(Point(225, 125), 625, 75),
+        Rough(Point(150, 125), 75, 500),
 
-        Wall(Point(150, 75), Point(1000, 75), 5),
-        Wall(Point(1000, 75), Point(1000, 275), 5),
-        Wall(Point(375, 275), Point(1000, 275), 5),
-        Wall(Point(375, 275), Point(375, 700), 5),
-        Wall(Point(150, 700), Point(375, 700), 5),
-        Wall(Point(150, 75), Point(150, 700), 5),
+        Wall(Point(0, 0), Point(850, 0), 5),
+        Wall(Point(850, 0), Point(850, 200), 5),
+        Wall(Point(225, 200), Point(850, 200), 5),
+        Wall(Point(225, 200), Point(225, 625), 5),
+        Wall(Point(0, 625), Point(225, 625), 5),
+        Wall(Point(0, 0), Point(0, 625), 5),
 
-        Pin(Point(950, 125)),
+        Pin(Point(800, 50)),
     ),
     ball=Group(
-        GolfBall(Point(225, 650))
+        GolfBall(Point(75, 575))
     ),
 )
