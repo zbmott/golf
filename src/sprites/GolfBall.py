@@ -4,7 +4,7 @@ __author__ = 'zmott@nerdery.com'
 
 from os import path
 
-from pygame import math
+from pygame import math, Rect
 
 from src.utils import Point
 from .ImageSprite import ImageSprite
@@ -36,6 +36,13 @@ class GolfBall(ImageSprite):
         return Point(
             int(self.logical_position.x + self.RADIUS),
             int(self.logical_position.y + self.RADIUS)
+        )
+
+    @property
+    def collision_rect(self):
+        return Rect(
+            self.rect.x + 2, self.rect.y + 2,
+            self.rect.width - 4, self.rect.height - 4
         )
 
     def update(self):
@@ -72,7 +79,7 @@ class GolfBall(ImageSprite):
         collisions = []
 
         for collidible in collidibles.sprites():
-            if self.rect.collidelist(collidible.collision_rects) != -1:
+            if self.collision_rect.collidelist(collidible.collision_rects) != -1:
                 collisions.append(collidible)
 
         return collisions

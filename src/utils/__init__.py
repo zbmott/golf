@@ -41,8 +41,8 @@ class Point(object):
     def __sub__(self, other):
         if isinstance(other, Point):
             return Point(self.x - other.x, self.y - other.y, self.z - other.z)
-
-        raise ValueError('Points can only be subtracted from other Points.')
+        elif isinstance(other, Vector2):
+            return Point(self.x - other.x, self.y - other.y, self.z)
 
     def __eq__(self, other):
         if isinstance(other, Point):

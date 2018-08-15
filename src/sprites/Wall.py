@@ -69,4 +69,23 @@ class Wall(DirtySprite, Collidible):
         )
 
     def handle_collision(self, ball):
+        """
+        When the ball hits a wall, we back it up along its velocity vector
+        until it's no longer in contact with the wall, then we reflect its
+        velocity vector along the wall's axis.
+        """
+        # If the ball is no longer actually in contact with this wall
+        # (perhaps because a previous collision altered its position),
+        # do nothing.
+        if ball.collision_rect.collidelist(self.collision_rects) == -1:
+            return
+
+        backup_vector = ball.velocity.normalize()
+
+        while ball.collision_rect.collidelist(self.collision_rects) != -1:
+            new_pos = ball.logical_position - backup_vector
+            ball.set_logical_pos(new_pos)
+            ball.rect.x = new_pos.x
+            ball.rect.y = new_pos.y
+
         ball.velocity.reflect_ip(self.reflect_vector)
