@@ -3,18 +3,21 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import draw, math, Rect, sprite, Surface
+from pygame import draw, math, Rect, Surface
 from pygame.sprite import DirtySprite
 
-from src.utils import Point
+from src import constants
+from src.utils import colors, Point
 from .Collidible import Collidible
 
 
 class Wall(DirtySprite, Collidible):
     WALL_COLOR = (102, 51, 0)  # Brown.
 
-    def __init__(self, point1, point2, width, *groups):
+    def __init__(self, point1, point2, width=5, *groups):
         super().__init__(*groups)
+
+        self._layer = constants.LAYER_WALL
 
         self.width = width
 
@@ -34,13 +37,20 @@ class Wall(DirtySprite, Collidible):
             abs(point2.x - point1.x) + self.width,
             abs(point2.y - point1.y) + self.width
         ))
-        self.image.set_colorkey((0, 0, 0))
+        self.image.set_colorkey(colors.BLACK)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.origin.x
         self.rect.y = self.origin.y
 
         self.collision_rects = self.calculate_rectangles()
+
+    def __repr__(self):
+        return "Wall({p1!r}, {p2!r}, {self.width!r})".format(
+            p1=self.point1 + self.origin,
+            p2=self.point2 + self.origin,
+            self=self,
+        )
 
     def calculate_rectangles(self):
         rects = []

@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 from pygame import font
-from pygame.sprite import Group
+from pygame.sprite import LayeredDirty
 
 from src.models import Hole as BaseHole
 from src.sprites import *
@@ -16,13 +16,14 @@ Hole = BaseHole(
     'Hole #1',
     par=2,
     origin=Point(100, 100),
-    noncollidibles=Group(
+    ball=Point(430, 635),
+    noncollidibles=LayeredDirty(
         Text(Point(710, 63), 'Par 2', font.Font(None, 30), colors.WHITE),
     ),
-    collidibles=Group(
-        Rough(Point(390, 0), 300, 150),
-        Green(Point(490, 150), 100, 400),
-        Green(Point(390, 550), 300, 150),
+    collidibles=LayeredDirty(
+        Rough(Point(390, 0), Point(690, 150)),
+        Green(Point(490, 150), Point(590, 550)),
+        Green(Point(390, 550), Point(690, 700)),
 
         Wall(Point(390, 0), Point(690, 0), 5),
         Wall(Point(390, 0), Point(390, 150), 5),
@@ -38,8 +39,5 @@ Hole = BaseHole(
         Wall(Point(690, 550), Point(690, 700), 5),
 
         Pin(Point(628, 63)),
-    ),
-    ball=Group(
-        GolfBall(Point(430, 635))
     ),
 )

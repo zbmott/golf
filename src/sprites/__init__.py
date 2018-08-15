@@ -12,6 +12,7 @@ __all__ = [
     'ImageSprite',
     'Rough',
     'Sand',
+    'Slope',
     'Text',
     'Wall',
 ]
@@ -24,5 +25,6 @@ from .Pin import Pin
 from .ImageSprite import ImageSprite
 from .Rough import Rough
 from .Sand import Sand
+from .Slope import Slope
 from .Text import Text
 from .Wall import Wall

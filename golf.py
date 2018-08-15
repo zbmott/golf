@@ -7,11 +7,11 @@ __author__ = 'zmott@nerdery.com'
 import sys
 
 import pygame
-from pygame import draw, math, mouse
+from pygame import draw
 
 from transitions import Machine
 
-from src.utils import colors, Point
+from src.utils import colors
 
 
 class Quit(Exception):
@@ -37,7 +37,7 @@ class Golf(object):
             model=self,
             initial='home',
             states=self.STATES,
-            transitions=self.TRANSITIONS
+            transitions=self.TRANSITIONS,
         )
 
         self.screen = screen

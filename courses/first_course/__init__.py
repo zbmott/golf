@@ -10,4 +10,5 @@ __all__ = ['course']
 course = Course('The First Course', [
     'courses.first_course.Hole1',
     'courses.first_course.Hole2',
+    'courses.first_course.Hole3',
 ])

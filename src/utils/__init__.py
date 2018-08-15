@@ -10,6 +10,10 @@ __all__ = [
 ]
 
 
+def round_(n, base=10):
+    return int(base * round(float(n) / base))
+
+
 class Point(object):
     def __init__(self, x=0, y=0, z=0):
         self.x = x
@@ -31,6 +35,9 @@ class Point(object):
 
     def as_3d_tuple(self):
         return self.x, self.y, self.z
+
+    def __repr__(self):
+        return "Point({self.x!r}, {self.y!r}, {self.z!r})".format(self=self)
 
     def __add__(self, other):
         if isinstance(other, Point):

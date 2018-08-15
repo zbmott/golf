@@ -6,6 +6,7 @@ from os import path
 
 from pygame import math, Rect
 
+from src import constants
 from src.utils import Point
 from .ImageSprite import ImageSprite
 
@@ -17,12 +18,12 @@ class GolfBall(ImageSprite):
         'assets',
         'golfball_20x20.png'
     )
-    MAX_SPEED = 15
-    MAX_SPEED_SQUARED = MAX_SPEED**2
     STRIKE_SCALE_FACTOR = 7.5
 
     def __init__(self, point, *groups):
         super().__init__(*groups)
+
+        self._layer = constants.LAYER_BALL
 
         self.velocity = math.Vector2(0, 0)
 
@@ -64,12 +65,12 @@ class GolfBall(ImageSprite):
 
     def strike(self, x, y):
         self.velocity = math.Vector2(
-            (self.center.x - x) / self.STRIKE_SCALE_FACTOR,
-            (self.center.y - y) / self.STRIKE_SCALE_FACTOR
+            (self.center.x - x) / constants.STRIKE_SCALE_FACTOR,
+            (self.center.y - y) / constants.STRIKE_SCALE_FACTOR
         )
 
-        if self.velocity.length_squared() >= self.MAX_SPEED_SQUARED:
-            self.velocity.scale_to_length(self.MAX_SPEED)
+        if self.velocity.length_squared() >= constants.MAX_SPEED_SQUARED:
+            self.velocity.scale_to_length(constants.MAX_SPEED)
 
     def stop(self):
         self.velocity.x = 0

@@ -6,13 +6,13 @@ import pygame
 from pygame import draw, math, mouse, Surface
 from pygame.sprite import RenderUpdates
 
+from src import constants
+from src.sprites import GolfBall
 from src.utils import colors, Point
 
 
 class Hole(object):
-    """
-    """
-    def __init__(self, name, par, origin, width=1080, height=800, **labeled_groups):
+    def __init__(self, name, par, origin, width=1080, height=800, ball=None, **labeled_groups):
         self.score = -1
         self.name = name
         self.par = par
@@ -28,7 +28,7 @@ class Hole(object):
             self.groups[label] = group
             self.groups['all'].add(*group.sprites())
 
-        self.ball = self.groups['ball'].sprites()[0]
+        self.ball = GolfBall(ball, self.groups['all'])
 
     def update(self):
         collisions = self.ball.collide(self.groups['collidibles'])
@@ -63,8 +63,8 @@ class Hole(object):
             surface,
             (255, 0, 0),
             (ball.center.x, ball.center.y),
-            (ball.center.x + int(ball.STRIKE_SCALE_FACTOR * ball.velocity.x),
-             ball.center.y + int(ball.STRIKE_SCALE_FACTOR * ball.velocity.y)),
+            (ball.center.x + int(constants.STRIKE_SCALE_FACTOR * ball.velocity.x),
+             ball.center.y + int(constants.STRIKE_SCALE_FACTOR * ball.velocity.y)),
             3
         )
 
@@ -78,8 +78,8 @@ class Hole(object):
             mouse_pos.y - ball.center.y - self.origin.y
         )
 
-        if mouse_vec.length_squared() >= (ball.MAX_SPEED * ball.STRIKE_SCALE_FACTOR) ** 2:
-            mouse_vec.scale_to_length(ball.MAX_SPEED * ball.STRIKE_SCALE_FACTOR)
+        if mouse_vec.length_squared() >= (constants.MAX_SPEED * constants.STRIKE_SCALE_FACTOR) ** 2:
+            mouse_vec.scale_to_length(constants.MAX_SPEED * constants.STRIKE_SCALE_FACTOR)
 
         draw.line(
             surface,

@@ -6,11 +6,12 @@ from pygame import Rect, Surface
 from pygame.sprite import DirtySprite
 
 from src import constants
+from src.utils import Point
 from .Collidible import Collidible
 
 
-class FrictionalSurface(DirtySprite, Collidible):
-    def __init__(self, point1, point2, color, friction, *groups):
+class Slope(DirtySprite, Collidible):
+    def __init__(self, point1, point2, color, vector, *groups):
         super().__init__(*groups)
 
         self._layer = constants.LAYER_GROUND
@@ -18,29 +19,29 @@ class FrictionalSurface(DirtySprite, Collidible):
         self.width = abs(point2.x - point1.x)
         self.height = abs(point2.y - point1.y)
         self.color = color
-        self.friction = friction
+        self.vector = vector
 
         self.image = Surface((
-            self.width,
-            self.height,
+            self.width, self.height
         ))
 
         self.rect = Rect(point1.x, point1.y, self.width, self.height)
 
         self.collision_rects = [self.rect]
 
+    def __repr__(self):
+        p1 = Point(self.rect.x, self.rect.y)
+        p2 = Point(self.rect.x + self.rect.width, self.rect.y + self.rect.height)
+        return "Slope({p1!r}, {p2!r}, Color{color!r}, Vector2({x}, {y}))".format(
+            p1=p1,
+            p2=p2,
+            color=self.color,
+            x=self.vector.x,
+            y=self.vector.y,
+        )
+
     def update(self):
         self.image.fill(self.color, Rect(0, 0, self.width, self.height))
 
     def handle_collision(self, other):
-        try:
-            other.velocity.scale_to_length(
-                other.velocity.length() * self.friction
-            )
-        # ValueError will occur when other.velocity.length() is 0;
-        # i.e. when the ball is not moving.
-        except ValueError:
-            return
-
-        if other.velocity.length_squared() < constants.STOPPING_THRESHOLD:
-            other.stop()
+        other.velocity += self.vector
