@@ -6,12 +6,12 @@ __author__ = 'zmott@nerdery.com'
 from os import path
 
 import pygame
-from pygame import event, Rect
+from pygame import event
 
 from src import constants
 from src.utils import Point
 from .abstract import Collidible
-from .ImageSprite import ImageSprite
+from .abstract import ImageSprite
 
 
 class Pin(ImageSprite, Collidible):
@@ -26,24 +26,22 @@ class Pin(ImageSprite, Collidible):
 
         self._layer = constants.LAYER_PIN
 
-        self.rect.x = point.x
-        self.rect.y = point.y
-
-        self.collision_rects = [
-            Rect(
-                self.rect.x + (self.rect.width / 2),
-                self.rect.y + (self.rect.height / 2),
-                1,
-                1
-            )
-        ]
+        self.rect.x = point.x - self.rect.width // 2
+        self.rect.y = point.y - self.rect.height // 2
 
     def __repr__(self):
         return "Pin({p!r})".format(p=Point(self.rect.x, self.rect.y))
 
     @property
     def center(self):
-        return Point(self.collision_rects[0].x, self.collision_rects[0].y)
+        return Point(
+            self.rect.x + self.rect.width // 2,
+            self.rect.y + self.rect.height // 2
+        )
+
+    @classmethod
+    def create_for_editor(cls, points):
+        return cls(points[-1])
 
     def collide_with(self, ball):
         # If the ball is overlapping any portion of the hole,
@@ -55,8 +53,13 @@ class Pin(ImageSprite, Collidible):
                     center.x - ball.center.x,
                     center.y - ball.center.y
                 )
-                push.scale_to_length(constants.PIN_NUDGE_FACTOR)
-                ball.velocity += push
+
+                try:
+                    push.scale_to_length(constants.PIN_NUDGE_FACTOR)
+                except ValueError:
+                    pass
+                else:
+                    ball.velocity += push
 
         # If the ball is overlapping the center of the pin, see if
         # the player sank the putt.

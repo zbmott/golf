@@ -3,13 +3,12 @@
 
 __author__ = 'zmott@nerdery.com'
 
-import pickle, sys
+import copy, sys
 
 from transitions import Machine
 
 import pygame
 
-from src.models import Hole
 from src.sprites import *
 from src.sprites.abstract import FrictionalSurface
 from src.utils import colors, Point, round_
@@ -55,8 +54,7 @@ class Editor(object):
         self.all = pygame.sprite.LayeredUpdates()
 
         self.current_sprite_class = Green
-        self.start_point = None
-        self.end_point = None
+        self.points = []
 
         self.canvas_origin = Point(50, 50)
         self.canvas = pygame.Surface((1080, 900))
@@ -64,25 +62,39 @@ class Editor(object):
 
         self.orthogonal = False
 
+    def _mouse_pos(self):
+        """
+        Return the current position of the mouse cursor relative to
+        the canvas, snapped to a 10-pixel grid, and snapped to the
+        x or y axis.
+        """
+        where = Point(*map(round_, pygame.mouse.get_pos())) - self.canvas_origin
+
+        if self.should_snap_to_x(*where.as_2d_tuple()):
+            where.y = self.points[-1].y
+        elif self.should_snap_to_y(*where.as_2d_tuple()):
+            where.x = self.points[-1].x
+
+        return where
+
     def reset(self):
-        self.start_point = None
-        self.end_point = None
+        self.points = []
 
     def should_snap_to_x(self, x, y):
-        if not (self.start_point and self.orthogonal):
+        if not (self.points and self.orthogonal):
             return
 
-        dx = abs(x - self.start_point.x)
-        dy = abs(y - self.start_point.y)
+        dx = abs(x - self.points[-1].x)
+        dy = abs(y - self.points[-1].y)
 
         return dx > dy and dx - dy > 10
 
     def should_snap_to_y(self, x, y):
-        if not (self.start_point and self.orthogonal):
+        if not (self.points and self.orthogonal):
             return
 
-        dx = abs(x - self.start_point.x)
-        dy = abs(y - self.start_point.y)
+        dx = abs(x - self.points[-1].x)
+        dy = abs(y - self.points[-1].y)
 
         return dy > dx and dy - dx > 10
 
@@ -95,19 +107,9 @@ class Editor(object):
                 if self.canvas_rect.collidepoint(*event.pos):
                     self.handle_click(event)
             if event.type in [pygame.KEYDOWN]:
-                print("KEYDOWN: {event.key}, {event.mod}".format(event=event))
-
-                if event.key == 115 and event.mod == 1024:  # Cmd/Ctrl + S
-                    self.save()
-
-                if event.key in {303, 304}:  # Shift
-                    self.orthogonal = not self.orthogonal
-
-                if (event.key, event.mod) in self.SPRITE_KEY_MAP:
-                    self.current_sprite_class = self.SPRITE_KEY_MAP[(event.key, event.mod)]
-
-                if event.key == 27:  # Esc
-                    self.cancel()
+                self.handle_keydown(event)
+            if event.type in [pygame.KEYUP]:
+                self.handle_keyup(event)
 
         self.screen.fill(colors.DARKGRAY)
         self.canvas.fill(colors.BLACK)
@@ -116,63 +118,56 @@ class Editor(object):
         self.all.draw(self.canvas)
 
         if self.state == 'placing':
-            self.finalize(False)
+            self.finalize(endpoint=self._mouse_pos(), save=False)
 
         self.screen.blit(
             self.canvas,
             self.canvas_origin.as_2d_tuple()
         )
 
+        self.render_segment_length(self.screen, self.points)
+
         pygame.display.update()
 
-    def finalize(self, save=False):
-        x, y = pygame.mouse.get_pos()
-        end_point = Point(
-            round_(x - self.canvas_origin.x),
-            round_(y - self.canvas_origin.y)
+    def render_segment_length(self, surface, points):
+        p2 = self._mouse_pos()
+        f = pygame.font.Font(None, 28)
+        _, height = f.size('L =')
+
+        surface.blit(
+            f.render("{p.x}, {p.y}".format(p=p2), False, colors.WHITE),
+            (10, 5)
         )
 
-        if self.start_point == end_point:
+        if len(points) >= 1:
+            dx = points[-1].x - p2.x
+            dy = points[-1].y - p2.y
+
+            d = (dx ** 2 + dy ** 2) ** 0.5
+
+            surface.blit(
+                f.render("L = {}".format(int(d)), False, colors.WHITE),
+                (10, 10 + height)
+            )
+
+    def finalize(self, endpoint=None, save=False):
+        points_to_draw = copy.copy(self.points)
+        if endpoint:
+            points_to_draw.append(endpoint)
+
+        try:
+            sprite = self.current_sprite_class.create_for_editor(points_to_draw)
+
+        # Raised when we don't have enough points to draw a Wall (line).
+        except IndexError:
             return
 
-        def _normalize_coords(start, end):
-            minx = min(start.x, end.x)
-            miny = min(start.y, end.y)
-            maxx = max(start.x, end.x)
-            maxy = max(start.y, end.y)
-
-            return Point(minx, miny), Point(maxx, maxy)
-
-        if issubclass(self.current_sprite_class, FrictionalSurface):
-            try:
-                sprite = self.current_sprite_class(
-                    *_normalize_coords(self.start_point, end_point)
-                )
-            # ValueError will be raised if sprite is 1-dimensional.
-            except ValueError:
-                return
-
-        elif issubclass(self.current_sprite_class, Slope):
-            try:
-                sprite = self.current_sprite_class(
-                    *_normalize_coords(self.start_point, end_point),
-                    colors.RED,
-                    pygame.math.Vector2(0, 1),
-                )
-            # ValueError will be raised if sprite is 1-dimensional.
-            except ValueError:
-                return
-
-        elif issubclass(self.current_sprite_class, Wall):
-            if self.should_snap_to_x(*end_point.as_2d_tuple()):
-                end_point.y = self.start_point.y
-            elif self.should_snap_to_y(*end_point.as_2d_tuple()):
-                end_point.x = self.start_point.x
-
-            sprite = self.current_sprite_class(self.start_point, end_point)
-
-        elif issubclass(self.current_sprite_class, (GolfBall, Pin)):
-            sprite = self.current_sprite_class(end_point)
+        # Raised when there aren't enough points to draw a Surface (polygon).
+        except ValueError:
+            return pygame.draw.aalines(
+                self.canvas, colors.RED, False,
+                [p.as_2d_tuple() for p in points_to_draw], 3
+            )
 
         sprite.update()
 
@@ -186,20 +181,52 @@ class Editor(object):
 
     def handle_click(self, event):
         button = event.button
-        where = Point(
-            round_(event.pos[0] - self.canvas_origin.x),
-            round_(event.pos[1] - self.canvas_origin.y)
-        )
+        where = self._mouse_pos()
 
         if button != 1:
             return
 
         if self.state == 'home':
-            self.start_point = where
             self.place()
-        elif self.state == 'placing':
+
+        if self.state == 'placing':
+            self.points.append(where)
+
+            # Convenience logic for non-polygonal objects
+            if len(self.points) == 2:
+                self.finalize(save=True)
+
+                # If we're placing a 0-D object, finish placement after the 2nd click.
+                if issubclass(self.current_sprite_class, (GolfBall, Pin)):
+                    self.finish()
+
+                # If we're placing a 1-D object, finish placement, but start placing
+                # another object where the first one left off.
+                elif issubclass(self.current_sprite_class, (Wall,)):
+                    self.points = self.points[1:]
+
+    def handle_keydown(self, event):
+        print("KEYDOWN: {event.key}, {event.mod}".format(event=event))
+
+        if event.key == 115 and event.mod == 1024:  # Cmd/Ctrl + S
+            self.save()
+
+        if self.state == 'placing' and event.key == 32:  # Spacebar
             self.finalize(save=True)
             self.finish()
+
+        if event.key in {303, 304}:  # Shift
+            self.orthogonal = True
+
+        if (event.key, event.mod) in self.SPRITE_KEY_MAP:
+            self.current_sprite_class = self.SPRITE_KEY_MAP[(event.key, event.mod)]
+
+        if event.key == 27:  # Esc
+            self.cancel()
+
+    def handle_keyup(self, event):
+        if event.key in {303, 304}:
+            self.orthogonal = False
 
     def save(self):
         tmpl = """

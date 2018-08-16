@@ -7,7 +7,6 @@ __all__ = [
     'GolfBall',
     'Green',
     'Pin',
-    'ImageSprite',
     'Rough',
     'Sand',
     'Slope',
@@ -18,7 +17,6 @@ __all__ = [
 from .GolfBall import GolfBall
 from .Green import Green
 from .Pin import Pin
-from .ImageSprite import ImageSprite
 from .Rough import Rough
 from .Sand import Sand
 from .Slope import Slope

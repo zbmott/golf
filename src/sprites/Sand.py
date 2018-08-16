@@ -2,15 +2,14 @@
 
 __author__ = 'zmott@nerdery.com'
 
-from src.utils import colors, Point
+from src.utils import colors
 from .abstract import FrictionalSurface
 
 
 class Sand(FrictionalSurface):
-    def __init__(self, point1, point2, *groups):
-        super().__init__(point1, point2, colors.SANDY, 0.875, *groups)
+    def __init__(self, points, *groups):
+        super().__init__(points, colors.SANDY, 0.875, *groups)
 
     def __repr__(self):
-        p1 = Point(self.rect.x, self.rect.y)
-        p2 = Point(self.rect.x + self.rect.width, self.rect.y + self.rect.height)
-        return "Sand({p1!r}, {p2!r})".format(p1=p1, p2=p2)
+        points = ', '.join([repr(p) for p in self.points])
+        return "Sand([{points}])".format(points=points)

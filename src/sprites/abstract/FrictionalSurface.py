@@ -2,24 +2,18 @@
 
 __author__ = 'zmott@nerdery.com'
 
-
-from pygame import draw, Rect
-
 from src import constants
 from .Surface import Surface as SpriteSurface
 
 
 class FrictionalSurface(SpriteSurface):
-    def __init__(self, point1, point2, color, friction, *groups):
-        super().__init__(point1, point2, color, *groups)
+    def __init__(self, points, color, friction, *groups):
+        super().__init__(points, color, *groups)
         self.friction = friction
 
-    def update(self):
-        draw.rect(
-            self.image,
-            self.color,
-            Rect(0, 0, self.width, self.height)
-        )
+    @classmethod
+    def create_for_editor(cls, points, *pos, **kw):
+        return cls(points, *pos, **kw)
 
     def handle_collision(self, other):
         try:

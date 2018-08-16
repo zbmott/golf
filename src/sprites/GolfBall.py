@@ -8,7 +8,7 @@ from pygame import math, Rect
 
 from src import constants
 from src.utils import Point
-from .ImageSprite import ImageSprite
+from .abstract import ImageSprite
 
 
 class GolfBall(ImageSprite):
@@ -45,6 +45,10 @@ class GolfBall(ImageSprite):
             self.rect.x + 2, self.rect.y + 2,
             self.rect.width - 4, self.rect.height - 4
         )
+
+    @classmethod
+    def create_for_editor(cls, points):
+        return cls(points[-1])
 
     def update(self):
         self.logical_position.x += self.velocity.x

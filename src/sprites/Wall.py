@@ -51,6 +51,10 @@ class Wall(DirtySprite, Collidible):
             self=self,
         )
 
+    @classmethod
+    def create_for_editor(cls, points):
+        return cls(points[0], points[1])
+
     def update(self):
         draw.line(
             self.image,
@@ -72,7 +76,12 @@ class Wall(DirtySprite, Collidible):
         if not sprite.collide_mask(self, ball):
             return
 
-        backup_vector = ball.velocity.normalize()
+        try:
+            backup_vector = ball.velocity.normalize()
+
+        # ValueError is raised when ball.velocity has 0 magnitude.
+        except ValueError:
+            return
 
         while sprite.collide_mask(self, ball):
             new_pos = ball.logical_position - backup_vector
