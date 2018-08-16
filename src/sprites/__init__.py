@@ -4,8 +4,6 @@ __author__ = 'zmott@nerdery.com'
 
 
 __all__ = [
-    'Collidible',
-    'FrictionalSurface',
     'GolfBall',
     'Green',
     'Pin',
@@ -17,8 +15,6 @@ __all__ = [
     'Wall',
 ]
 
-from .Collidible import Collidible
-from .FrictionalSurface import FrictionalSurface
 from .GolfBall import GolfBall
 from .Green import Green
 from .Pin import Pin

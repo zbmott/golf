@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 from src.utils import colors, Point
-from .FrictionalSurface import FrictionalSurface
+from .abstract import FrictionalSurface
 
 
 class Rough(FrictionalSurface):

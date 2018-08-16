@@ -75,12 +75,3 @@ class GolfBall(ImageSprite):
     def stop(self):
         self.velocity.x = 0
         self.velocity.y = 0
-
-    def collide(self, collidibles):
-        collisions = []
-
-        for collidible in collidibles.sprites():
-            if self.collision_rect.collidelist(collidible.collision_rects) != -1:
-                collisions.append(collidible)
-
-        return collisions

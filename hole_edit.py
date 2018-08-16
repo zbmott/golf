@@ -11,6 +11,7 @@ import pygame
 
 from src.models import Hole
 from src.sprites import *
+from src.sprites.abstract import FrictionalSurface
 from src.utils import colors, Point, round_
 
 
@@ -216,6 +217,7 @@ Hole = BaseHole(
     par=3,
     origin={origin!r},
     ball={ball_pos!r},
+    noncollidibles=LayeredDirty(),
     collidibles=LayeredDirty(
         {collidibles}
     )

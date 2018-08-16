@@ -2,37 +2,16 @@
 
 __author__ = 'zmott@nerdery.com'
 
-from pygame import mask, Rect, Surface
-from pygame.sprite import DirtySprite
+from pygame import Rect
 
-from src import constants
-from src.utils import colors, Point
-from .Collidible import Collidible
+from src.utils import Point
+from .abstract import Surface as SpriteSurface
 
 
-class Slope(DirtySprite, Collidible):
+class Slope(SpriteSurface):
     def __init__(self, point1, point2, color, vector, *groups):
-        super().__init__(*groups)
-
-        self._layer = constants.LAYER_GROUND
-
-        self.width = abs(point2.x - point1.x)
-        self.height = abs(point2.y - point1.y)
-        self.color = color
+        super().__init__(point1, point2, color, *groups)
         self.vector = vector
-
-        if self.width * self.height == 0:
-            raise ValueError('Slope cannot be 1-dimensional')
-
-        self.image = Surface((
-            self.width, self.height
-        ))
-        self.image.set_colorkey(colors.BLACK)
-
-        self.rect = Rect(point1.x, point1.y, self.width, self.height)
-
-        self.update()
-        self.mask = mask.from_surface(self.image)
 
     def __repr__(self):
         p1 = Point(self.rect.x, self.rect.y)

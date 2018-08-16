@@ -31,17 +31,8 @@ class Hole(object):
         self.ball = GolfBall(ball, self.groups['all'])
 
     def update(self):
-        collisions = sprite.spritecollide(
-            self.ball,
-            self.groups['collidibles'],
-            dokill=False,
-            collided=sprite.collide_mask
-
-        )
-
-#        collisions = self.ball.collide(self.groups['collidibles'])
-        for collision in collisions:
-            collision.handle_collision(self.ball)
+        for c in self.groups['collidibles']:
+            c.collide_with(self.ball)
 
         self.groups['all'].update()
 

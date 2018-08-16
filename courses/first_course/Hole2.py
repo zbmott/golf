@@ -9,28 +9,35 @@ from src.models import Hole as BaseHole
 from src.sprites import *
 from src.utils import colors, Point
 
+__all__ = ['Hole']
+
 
 Hole = BaseHole(
     'Hole #2',
-    par=3,
+    par=2,
     origin=Point(100, 100),
-    ball=Point(75, 575),
+    ball=Point(430, 635),
     noncollidibles=LayeredDirty(
-        Text(Point(880, 50), 'Par 3', font.Font(None, 30), colors.WHITE),
+        Text(Point(710, 63), 'Par 2', font.Font(None, 30), colors.WHITE),
     ),
     collidibles=LayeredDirty(
-        Wall(Point(0, 0), Point(850, 0), 5),
-        Wall(Point(850, 0), Point(850, 200), 5),
-        Wall(Point(225, 200), Point(850, 200), 5),
-        Wall(Point(225, 200), Point(225, 625), 5),
-        Wall(Point(0, 625), Point(225, 625), 5),
-        Wall(Point(0, 0), Point(0, 625), 5),
+        Rough(Point(390, 0), Point(690, 150)),
+        Green(Point(490, 150), Point(590, 550)),
+        Green(Point(390, 550), Point(690, 700)),
 
-        Pin(Point(800, 50)),
+        Wall(Point(390, 0), Point(690, 0), 5),
+        Wall(Point(390, 0), Point(390, 150), 5),
+        Wall(Point(690, 0), Point(690, 150), 5),
+        Wall(Point(390, 150), Point(490, 150), 5),
+        Wall(Point(590, 150), Point(690, 150), 5),
+        Wall(Point(490, 150), Point(490, 550), 5),
+        Wall(Point(590, 150), Point(590, 550), 5),
+        Wall(Point(390, 550), Point(490, 550), 5),
+        Wall(Point(590, 550), Point(690, 550), 5),
+        Wall(Point(390, 550), Point(390, 700), 5),
+        Wall(Point(390, 700), Point(690, 700), 5),
+        Wall(Point(690, 550), Point(690, 700), 5),
 
-        Green(Point(0, 0), Point(850, 125)),
-        Green(Point(0, 125), Point(150, 625)),
-        Sand(Point(225, 125), Point(850, 200)),
-        Rough(Point(150, 125), Point(225, 625)),
+        Pin(Point(628, 63)),
     ),
 )

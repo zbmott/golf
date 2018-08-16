@@ -10,7 +10,7 @@ from pygame import event, Rect
 
 from src import constants
 from src.utils import Point
-from .Collidible import Collidible
+from .abstract import Collidible
 from .ImageSprite import ImageSprite
 
 
@@ -45,9 +45,27 @@ class Pin(ImageSprite, Collidible):
     def center(self):
         return Point(self.collision_rects[0].x, self.collision_rects[0].y)
 
-    def handle_collision(self, other):
-        if other.velocity.length_squared() <= constants.SINK_THRESHOLD:
-            other.stop()
-            other.center_on(self.center)
+    def collide_with(self, ball):
+        # If the ball is overlapping any portion of the hole,
+        # give it a little push into the cup.
+        if self.is_colliding_with(ball):
+            if ball.velocity.length_squared() >= 0.5:
+                center = self.center
+                push = pygame.math.Vector2(
+                    center.x - ball.center.x,
+                    center.y - ball.center.y
+                )
+                push.scale_to_length(0.2)
+                ball.velocity += push
+
+        # If the ball is overlapping the center of the pin, see if
+        # the player sank the putt.
+        if ball.collision_rect.collidepoint(self.center.as_2d_tuple()):
+            self.sink_putt(ball)
+
+    def sink_putt(self, ball):
+        if ball.velocity.length_squared() <= constants.SINK_THRESHOLD:
+            ball.stop()
+            ball.center_on(self.center)
 
             event.post(event.Event(pygame.USEREVENT, code='hole_complete'))

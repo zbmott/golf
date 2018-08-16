@@ -3,12 +3,12 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import draw, mask, math, Rect, sprite, Surface
+from pygame import draw, mask, math, sprite, Surface
 from pygame.sprite import DirtySprite
 
 from src import constants
 from src.utils import colors, Point
-from .Collidible import Collidible
+from .abstract import Collidible
 
 
 class Wall(DirtySprite, Collidible):
