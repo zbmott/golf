@@ -15,12 +15,12 @@ Part of the fun is that it's not very good and weird things happen.
 ```
 
 ## Editing levels
-`golf` comes with a bad level editor: `hole_edit.py`. You can run it with
+`golf` comes with a bad level editor, `hole_edit.py`. You can run it with
 ```
 > python hole_edit.py
 ```
 Here's how it works:
-- The black area is your canvas. You're only allowed to put minigolf elements in black area.
+- The black area is your canvas. You're only allowed to put minigolf elements on the canvas.
 - You use the keyboard to switch between minigolf elements, and you use left-click to place them.
 - Here are the available minigolf elements:
   - Golf(B)all
