@@ -143,16 +143,24 @@ class Editor(object):
             return Point(minx, miny), Point(maxx, maxy)
 
         if issubclass(self.current_sprite_class, FrictionalSurface):
-            sprite = self.current_sprite_class(
-                *_normalize_coords(self.start_point, end_point)
-            )
+            try:
+                sprite = self.current_sprite_class(
+                    *_normalize_coords(self.start_point, end_point)
+                )
+            # ValueError will be raised if sprite is 1-dimensional.
+            except ValueError:
+                return
 
         elif issubclass(self.current_sprite_class, Slope):
-            sprite = self.current_sprite_class(
-                *_normalize_coords(self.start_point, end_point),
-                colors.RED,
-                pygame.math.Vector2(0, 1),
-        )
+            try:
+                sprite = self.current_sprite_class(
+                    *_normalize_coords(self.start_point, end_point),
+                    colors.RED,
+                    pygame.math.Vector2(0, 1),
+                )
+            # ValueError will be raised if sprite is 1-dimensional.
+            except ValueError:
+                return
 
         elif issubclass(self.current_sprite_class, Wall):
             if self.should_snap_to_x(*end_point.as_2d_tuple()):

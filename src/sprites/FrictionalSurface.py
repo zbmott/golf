@@ -21,6 +21,9 @@ class FrictionalSurface(DirtySprite, Collidible):
         self.color = color
         self.friction = friction
 
+        if self.width * self.height == 0:
+            raise ValueError('FrictionalSurface cannot be 1-dimensional')
+
         self.image = Surface((
             self.width,
             self.height,

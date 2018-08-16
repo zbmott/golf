@@ -51,23 +51,6 @@ class Wall(DirtySprite, Collidible):
             self=self,
         )
 
-    def calculate_rectangles(self):
-        rects = []
-        current_pixel = self.point1
-        real_pixel = Point(int(current_pixel.x), int(current_pixel.y))
-
-        while real_pixel != self.point2:
-            rects.append(Rect(
-                *(current_pixel + self.origin).as_2d_tuple(),
-                self.width,
-                self.width
-            ))
-
-            current_pixel += self._draw_vector
-            real_pixel = Point(int(current_pixel.x), int(current_pixel.y))
-
-        return rects
-
     def update(self):
         draw.line(
             self.image,

@@ -21,6 +21,9 @@ class Slope(DirtySprite, Collidible):
         self.color = color
         self.vector = vector
 
+        if self.width * self.height == 0:
+            raise ValueError('Slope cannot be 1-dimensional')
+
         self.image = Surface((
             self.width, self.height
         ))
