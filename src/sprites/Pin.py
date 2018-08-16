@@ -49,13 +49,13 @@ class Pin(ImageSprite, Collidible):
         # If the ball is overlapping any portion of the hole,
         # give it a little push into the cup.
         if self.is_colliding_with(ball):
-            if ball.velocity.length_squared() >= 0.5:
+            if ball.velocity.length_squared() >= constants.PIN_NUDGE_THRESHOLD:
                 center = self.center
                 push = pygame.math.Vector2(
                     center.x - ball.center.x,
                     center.y - ball.center.y
                 )
-                push.scale_to_length(0.2)
+                push.scale_to_length(constants.PIN_NUDGE_FACTOR)
                 ball.velocity += push
 
         # If the ball is overlapping the center of the pin, see if

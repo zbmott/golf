@@ -81,3 +81,4 @@ class Wall(DirtySprite, Collidible):
             ball.rect.y = new_pos.y
 
         ball.velocity.reflect_ip(self.reflect_vector)
+        ball.velocity.scale_to_length(ball.velocity.length() * constants.WALL_ELASTICITY)

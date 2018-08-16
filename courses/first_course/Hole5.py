@@ -30,7 +30,7 @@ Hole = BaseHole(
         Rough(Point(570, 80, 0), Point(630, 370, 0)),
         Rough(Point(340, 80, 0), Point(400, 320, 0)),
         Rough(Point(340, 320, 0), Point(400, 370, 0)),
-        Rough(Point(400, 320, 0), Point(570, 690, 0)),
+        Green(Point(400, 320, 0), Point(570, 690, 0)),
         Pin(Point(478, 188, 0)),
         Wall(Point(340, 30, 0), Point(630, 30, 0), 5),
         Wall(Point(630, 30, 0), Point(630, 370, 0), 5),
