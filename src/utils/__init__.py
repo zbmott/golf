@@ -2,7 +2,6 @@
 
 __author__ = 'zmott@nerdery.com'
 
-from pygame import Color
 from pygame.math import Vector2
 
 __all__ = [

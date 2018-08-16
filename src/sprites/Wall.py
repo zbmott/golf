@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import draw, math, Rect, Surface
+from pygame import draw, mask, math, Rect, sprite, Surface
 from pygame.sprite import DirtySprite
 
 from src import constants
@@ -12,8 +12,6 @@ from .Collidible import Collidible
 
 
 class Wall(DirtySprite, Collidible):
-    WALL_COLOR = (102, 51, 0)  # Brown.
-
     def __init__(self, point1, point2, width=5, *groups):
         super().__init__(*groups)
 
@@ -43,7 +41,8 @@ class Wall(DirtySprite, Collidible):
         self.rect.x = self.origin.x
         self.rect.y = self.origin.y
 
-        self.collision_rects = self.calculate_rectangles()
+        self.update()
+        self.mask = mask.from_surface(self.image)
 
     def __repr__(self):
         return "Wall({p1!r}, {p2!r}, {self.width!r})".format(
@@ -72,7 +71,7 @@ class Wall(DirtySprite, Collidible):
     def update(self):
         draw.line(
             self.image,
-            self.WALL_COLOR,
+            colors.BROWN,
             (self.point1.x, self.point1.y),
             (self.point2.x, self.point2.y),
             self.width
@@ -87,12 +86,12 @@ class Wall(DirtySprite, Collidible):
         # If the ball is no longer actually in contact with this wall
         # (perhaps because a previous collision altered its position),
         # do nothing.
-        if ball.collision_rect.collidelist(self.collision_rects) == -1:
+        if not sprite.collide_mask(self, ball):
             return
 
         backup_vector = ball.velocity.normalize()
 
-        while ball.collision_rect.collidelist(self.collision_rects) != -1:
+        while sprite.collide_mask(self, ball):
             new_pos = ball.logical_position - backup_vector
             ball.set_logical_pos(new_pos)
             ball.rect.x = new_pos.x

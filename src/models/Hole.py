@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 import pygame
-from pygame import draw, math, mouse, Surface
+from pygame import draw, math, mouse, sprite, Surface
 from pygame.sprite import RenderUpdates
 
 from src import constants
@@ -31,7 +31,15 @@ class Hole(object):
         self.ball = GolfBall(ball, self.groups['all'])
 
     def update(self):
-        collisions = self.ball.collide(self.groups['collidibles'])
+        collisions = sprite.spritecollide(
+            self.ball,
+            self.groups['collidibles'],
+            dokill=False,
+            collided=sprite.collide_mask
+
+        )
+
+#        collisions = self.ball.collide(self.groups['collidibles'])
         for collision in collisions:
             collision.handle_collision(self.ball)
 

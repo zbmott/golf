@@ -2,10 +2,11 @@
 
 __author__ = 'zmott@nerdery.com'
 
-from pygame import Rect, Surface
+from pygame import draw, mask, Rect, Surface
 from pygame.sprite import DirtySprite
 
 from src import constants
+from src.utils import colors
 from .Collidible import Collidible
 
 
@@ -24,13 +25,19 @@ class FrictionalSurface(DirtySprite, Collidible):
             self.width,
             self.height,
         ))
+        self.image.set_colorkey(colors.BLACK)
 
         self.rect = Rect(point1.x, point1.y, self.width, self.height)
 
-        self.collision_rects = [self.rect]
+        self.update()
+        self.mask = mask.from_surface(self.image)
 
     def update(self):
-        self.image.fill(self.color, Rect(0, 0, self.width, self.height))
+        draw.rect(
+            self.image,
+            self.color,
+            Rect(0, 0, self.width, self.height)
+        )
 
     def handle_collision(self, other):
         try:

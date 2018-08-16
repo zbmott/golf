@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import image
+from pygame import image, mask
 from pygame.sprite import DirtySprite
 
 
@@ -15,5 +15,7 @@ class ImageSprite(DirtySprite):
 
         self.image = image.load(self.IMAGE_PATH)
         self.image.convert_alpha()
+
+        self.mask = mask.from_surface(self.image)
 
         self.rect = self.image.get_rect()
