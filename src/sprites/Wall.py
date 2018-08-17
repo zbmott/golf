@@ -15,8 +15,8 @@ class Wall(DirtySprite, Collidible):
     def __init__(self, point1, point2, width=5, *groups):
         super().__init__(*groups)
 
+        self.points = [point1, point2]
         self._layer = constants.LAYER_WALL
-
         self.width = width
 
         # This sprite's origin on the application's screen.
@@ -27,9 +27,8 @@ class Wall(DirtySprite, Collidible):
         self.point1 = point1 - self.origin
         self.point2 = point2 - self.origin
 
-        self._draw_vector = math.Vector2(*(self.point2 - self.point1).as_2d_tuple())
-        self._draw_vector.scale_to_length(1)
-        self.reflect_vector = math.Vector2(self._draw_vector.y, self._draw_vector.x)
+        v = math.Vector2(*(point2 - point1).as_2d_tuple())
+        self.reflect_vector = math.Vector2(-1 * v.y, v.x)
 
         self.image = Surface((
             abs(point2.x - point1.x) + self.width,

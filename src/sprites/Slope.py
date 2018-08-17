@@ -23,8 +23,8 @@ class Slope(SpriteSurface):
         )
 
     @classmethod
-    def create_for_editor(cls, points):
-        return cls(points, colors.RED, pygame.math.Vector2(0, 0))
+    def create_for_editor(cls, points, *pos, **kw):
+        return cls(points, colors.RED, pygame.math.Vector2(0, 0), *pos, **kw)
 
     def handle_collision(self, other):
         other.velocity += self.vector

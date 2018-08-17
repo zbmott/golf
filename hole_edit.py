@@ -4,13 +4,13 @@
 __author__ = 'zmott@nerdery.com'
 
 import copy, sys
+from operator import attrgetter
 
 from transitions import Machine
 
 import pygame
 
 from src.sprites import *
-from src.sprites.abstract import FrictionalSurface
 from src.utils import colors, Point, round_
 
 
@@ -62,6 +62,7 @@ class Editor(object):
         self.canvas_rect = pygame.Rect(50, 50, 1080, 900)
 
         self.orthogonal = False
+        self.selection = None
 
     def _mouse_pos(self):
         """
@@ -79,6 +80,8 @@ class Editor(object):
         return where
 
     def reset(self):
+        self.current_sprite_class = None
+        self.selection = None
         self.points = []
 
     def should_snap_to_x(self, x, y):
@@ -127,6 +130,7 @@ class Editor(object):
         )
 
         self.render_segment_length(self.screen, self.points)
+        self.render_selection(self.screen)
 
         pygame.display.update()
 
@@ -150,6 +154,33 @@ class Editor(object):
                 f.render("L = {}".format(int(d)), False, colors.WHITE),
                 (10, 10 + height)
             )
+
+    def render_selection(self, surface):
+        if self.selection is None:
+            return
+
+        target = self.selection.rect
+
+        pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Upper left
+            self.canvas_origin.x + target.x - 3,
+            self.canvas_origin.y + target.y - 3,
+            3, 3
+        ))
+        pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Upper right
+            self.canvas_origin.x + target.x + target.width,
+            self.canvas_origin.y + target.y - 3,
+            3, 3
+        ))
+        pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Bottom left
+            self.canvas_origin.x + target.x - 3,
+            self.canvas_origin.y + target.y + target.height,
+            3, 3
+        ))
+        pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Bottom right
+            self.canvas_origin.x + target.x + target.width,
+            self.canvas_origin.y + target.y + target.height,
+            3, 3
+        ))
 
     def finalize(self, endpoint=None, save=False):
         points_to_draw = copy.copy(self.points)
@@ -188,7 +219,11 @@ class Editor(object):
             return
 
         if self.state == 'home':
-            self.place()
+            self.selection = None
+            if self.current_sprite_class is not None:
+                self.place()
+            else:
+                self.selection = self.select(where)
 
         if self.state == 'placing':
             self.points.append(where)
@@ -206,10 +241,22 @@ class Editor(object):
                 elif issubclass(self.current_sprite_class, (Wall,)):
                     self.points = self.points[1:]
 
+    def select(self, pos):
+        """
+        Return the topmost sprite whose rect contains the given position.
+        This could be improved by making a 1x1 mask at that location and
+        using sprite.collide_mask instead of rect.collidepoint.
+        """
+        for s in sorted(self.all.sprites(), key=attrgetter('_layer'), reverse=True):
+            if s.rect.collidepoint(pos.as_2d_tuple()):
+                return s
+
+        return None
+
     def handle_keydown(self, event):
         print("KEYDOWN: {event.key}, {event.mod}".format(event=event))
 
-        if event.key == 115 and event.mod == 1024:  # Cmd/Ctrl + S
+        if event.key == 115 and event.mod > 0:  # Cmd/Ctrl + S
             self.save()
 
         if self.state == 'placing' and event.key == 32:  # Spacebar
@@ -221,13 +268,33 @@ class Editor(object):
 
         if (event.key, event.mod) in self.SPRITE_KEY_MAP:
             self.current_sprite_class = self.SPRITE_KEY_MAP[(event.key, event.mod)]
+            if self.selection is not None:
+                self._replace_selection()
 
         if event.key == 27:  # Esc
             self.cancel()
 
+        if event.key in {8, 127}:  # Backspace, Delete:
+            if self.selection:
+                self.selection.kill()
+                self.selection = None
+
     def handle_keyup(self, event):
         if event.key in {303, 304}:
             self.orthogonal = False
+
+    def _replace_selection(self):
+        """
+        Replace self.selection with an instance of self.current_sprite_class.
+        """
+        try:
+            new = self.current_sprite_class.create_for_editor(self.selection.points)
+        except (ValueError, TypeError, IndexError):
+            pass
+        else:
+            self.all.add(new)
+            self.selection.kill()
+            self.selection = new
 
     def save(self):
         tmpl = """

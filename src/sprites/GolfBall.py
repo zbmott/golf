@@ -23,6 +23,7 @@ class GolfBall(ImageSprite):
     def __init__(self, point, *groups):
         super().__init__(*groups)
 
+        self.points = [point]
         self._layer = constants.LAYER_BALL
 
         self.velocity = math.Vector2(0, 0)

@@ -24,6 +24,7 @@ class Pin(ImageSprite, Collidible):
     def __init__(self, point, *groups):
         super().__init__(*groups)
 
+        self.points = [point]
         self._layer = constants.LAYER_PIN
 
         self.rect.x = point.x - self.rect.width // 2
