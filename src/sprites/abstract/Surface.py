@@ -41,6 +41,23 @@ class Surface(sprite.DirtySprite, Collidible):
 
         self.mask = mask.from_surface(self.image)
 
+    def __repr__(self):
+        return "{cls}([{points}])".format(
+            cls=self.__class__.__name__,
+            points=', '.join([repr(p) for p in self.points])
+        )
+
+    @classmethod
+    def create_for_editor(cls, points):
+        return cls(points)
+
+    def collide_with(self, ball):
+        """
+        Surfaces only collide with the ball if the ball is currently moving.
+        """
+        if ball.should_collide_with_surface:
+            super().collide_with(ball)
+
     def update(self):
         draw.polygon(
             self.image,

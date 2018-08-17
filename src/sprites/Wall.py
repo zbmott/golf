@@ -70,24 +70,13 @@ class Wall(DirtySprite, Collidible):
         until it's no longer in contact with the wall, then we reflect its
         velocity vector along the wall's axis.
         """
-        # If the ball is no longer actually in contact with this wall
-        # (perhaps because a previous collision altered its position),
-        # do nothing.
-        if not sprite.collide_mask(self, ball):
-            return
-
-        try:
-            backup_vector = ball.velocity.normalize()
-
-        # ValueError is raised when ball.velocity has 0 magnitude.
-        except ValueError:
-            return
-
-        while sprite.collide_mask(self, ball):
-            new_pos = ball.logical_position - backup_vector
-            ball.set_logical_pos(new_pos)
-            ball.rect.x = new_pos.x
-            ball.rect.y = new_pos.y
+        self.backup(ball)
 
         ball.velocity.reflect_ip(self.reflect_vector)
-        ball.velocity.scale_to_length(ball.velocity.length() * constants.WALL_ELASTICITY)
+
+        try:
+            ball.velocity.scale_to_length(
+                ball.velocity.length() * constants.WALL_ELASTICITY
+            )
+        except ValueError:
+            pass

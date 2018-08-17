@@ -9,7 +9,3 @@ from .abstract import FrictionalSurface
 class Rough(FrictionalSurface):
     def __init__(self, points, *groups):
         super().__init__(points, colors.DARKGREEN, 0.945, *groups)
-
-    def __repr__(self):
-        points = ', '.join([repr(p) for p in self.points])
-        return "Rough([{points}])".format(points=points)

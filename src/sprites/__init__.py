@@ -12,6 +12,7 @@ __all__ = [
     'Slope',
     'Text',
     'Wall',
+    'Water',
 ]
 
 from .GolfBall import GolfBall
@@ -22,3 +23,4 @@ from .Sand import Sand
 from .Slope import Slope
 from .Text import Text
 from .Wall import Wall
+from .Water import Water

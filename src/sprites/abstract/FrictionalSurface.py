@@ -15,15 +15,20 @@ class FrictionalSurface(SpriteSurface):
     def create_for_editor(cls, points, *pos, **kw):
         return cls(points, *pos, **kw)
 
-    def handle_collision(self, other):
+    def handle_collision(self, ball):
+        """
+        Frictional surfaces scale the ball's velocity magnitude by a fixed
+        coefficient (self.friction), and then stop the ball if the square
+        of its velocity magnitude is less than constants.STOPPING_THRESHOLD.
+        """
         try:
-            other.velocity.scale_to_length(
-                other.velocity.length() * self.friction
+            ball.velocity.scale_to_length(
+                ball.velocity.length() * self.friction
             )
-        # ValueError will occur when other.velocity.length() is 0;
+        # ValueError will occur when ball.velocity.length() is 0;
         # i.e. when the ball is not moving.
         except ValueError:
             return
 
-        if other.velocity.length_squared() < constants.STOPPING_THRESHOLD:
-            other.stop()
+        if ball.velocity.length_squared() < constants.STOPPING_THRESHOLD:
+            ball.stop()

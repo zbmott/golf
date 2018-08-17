@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 import pygame
-from pygame import draw, math, mouse, sprite, Surface
+from pygame import draw, math, mouse, Surface
 from pygame.sprite import RenderUpdates
 
 from src import constants
@@ -31,10 +31,10 @@ class Hole(object):
         self.ball = GolfBall(ball, self.groups['all'])
 
     def update(self):
+        self.groups['all'].update()
+
         for c in self.groups['collidibles']:
             c.collide_with(self.ball)
-
-        self.groups['all'].update()
 
     def draw(self):
         self.image.fill(colors.DARKGRAY)
@@ -52,6 +52,9 @@ class Hole(object):
         if e.type in [pygame.MOUSEBUTTONDOWN]:
             if e.button == 1:
                 self.ball.strike(e.pos[0] - self.origin.x, e.pos[1] - self.origin.y)
+                self.score += 1
+        if e.type in [pygame.USEREVENT]:
+            if e.code == 'penalty':
                 self.score += 1
 
     def _visualize_velocity(self, ball, surface):
@@ -77,8 +80,10 @@ class Hole(object):
             mouse_pos.y - ball.center.y - self.origin.y
         )
 
-        if mouse_vec.length_squared() >= (constants.MAX_SPEED * constants.STRIKE_SCALE_FACTOR) ** 2:
-            mouse_vec.scale_to_length(constants.MAX_SPEED * constants.STRIKE_SCALE_FACTOR)
+        max_speed = constants.MAX_SPEED * constants.STRIKE_SCALE_FACTOR
+
+        if mouse_vec.length_squared() > max_speed ** 2:
+            mouse_vec.scale_to_length(max_speed)
 
         draw.line(
             surface,
@@ -88,3 +93,12 @@ class Hole(object):
              int(ball.center.y - mouse_vec.y)),
             3
         )
+
+        power = int(mouse_vec.length() / max_speed * 100)
+        font = pygame.font.Font(None, 20)
+
+        surface.blit(
+            font.render("{power!s}%".format(power=power), True, colors.WHITE),
+            (ball.center.x + 10, ball.center.y + 10)
+        )
+

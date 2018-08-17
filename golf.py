@@ -100,6 +100,8 @@ class Golf(object):
         check for collisions, then update the game state and redraw the screen.
         """
         for event in pygame.event.get():
+            self.current_hole.handle_event(event)
+
             if event.type in [pygame.QUIT]:
                 self.quit()
             elif event.type in [pygame.USEREVENT]:
@@ -108,8 +110,6 @@ class Golf(object):
                         self.next_hole()
                     except StopIteration:
                         self.end_game()
-            else:
-                self.current_hole.handle_event(event)
 
         self.screen.fill(colors.DARKGRAY)
         self.current_hole.update()

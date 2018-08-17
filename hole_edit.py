@@ -37,6 +37,7 @@ class Editor(object):
         (112, 0): Pin,      # P
         (114, 0): Rough,    # R
         (115, 0): Sand,     # S
+        (116, 0): Water,    # T
         (119, 0): Wall      # W
     }
 

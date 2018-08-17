@@ -32,6 +32,9 @@ class GolfBall(ImageSprite):
         self.rect.x = self.logical_position.x
         self.rect.y = self.logical_position.y
 
+        self.previous_positions = []
+        self.previous_velocities = []
+
     @property
     def center(self):
         return Point(
@@ -45,6 +48,14 @@ class GolfBall(ImageSprite):
             self.rect.x + 2, self.rect.y + 2,
             self.rect.width - 4, self.rect.height - 4
         )
+
+    @property
+    def should_collide_with_surface(self):
+        """
+        The ball shouldn't collide with a surface if it isn't moving.
+        (I.e. x and y velocity components are 0.)
+        """
+        return abs(self.velocity.x) > 0 or abs(self.velocity.y) > 0
 
     @classmethod
     def create_for_editor(cls, points):
@@ -68,6 +79,9 @@ class GolfBall(ImageSprite):
         self.set_logical_pos(Point(point.x - self.RADIUS, point.y - self.RADIUS))
 
     def strike(self, x, y):
+        self.previous_positions.append(self.logical_position)
+        self.previous_velocities.append(self.velocity)
+
         self.velocity = math.Vector2(
             (self.center.x - x) / constants.STRIKE_SCALE_FACTOR,
             (self.center.y - y) / constants.STRIKE_SCALE_FACTOR
@@ -77,5 +91,5 @@ class GolfBall(ImageSprite):
             self.velocity.scale_to_length(constants.MAX_SPEED)
 
     def stop(self):
-        self.velocity.x = 0
-        self.velocity.y = 0
+        self.previous_velocities.append(self.velocity)
+        self.velocity = math.Vector2(0, 0)
