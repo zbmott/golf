@@ -11,6 +11,7 @@ __all__ = [
     'Sand',
     'Slope',
     'Text',
+    'Lava',
     'Wall',
     'Water',
 ]
@@ -22,5 +23,6 @@ from .Rough import Rough
 from .Sand import Sand
 from .Slope import Slope
 from .Text import Text
+from .Lava import Lava
 from .Wall import Wall
 from .Water import Water

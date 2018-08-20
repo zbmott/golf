@@ -15,4 +15,5 @@ course = Course('The First Course', [
     'courses.first_course.Hole5',
     'courses.first_course.Hole6',
     'courses.first_course.Hole7',
+    'courses.first_course.Hole8',
 ])

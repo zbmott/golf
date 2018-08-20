@@ -39,4 +39,8 @@ class Water(FrictionalSurface):
 
             ball.stop()
 
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, code='penalty'))
+            pygame.event.post(pygame.event.Event(
+                pygame.USEREVENT,
+                code='penalty',
+                degree=1
+            ))

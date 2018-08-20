@@ -38,6 +38,7 @@ class Editor(object):
         (114, 0): Rough,    # R
         (115, 0): Sand,     # S
         (116, 0): Water,    # T
+        (118, 0): Lava,     # V
         (119, 0): Wall      # W
     }
 

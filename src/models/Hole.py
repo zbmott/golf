@@ -36,14 +36,14 @@ class Hole(object):
         for c in self.groups['collidibles']:
             c.collide_with(self.ball)
 
-    def draw(self):
+    def draw(self, show_pointer=True, show_velocity=True):
         self.image.fill(colors.DARKGRAY)
         self.groups['all'].draw(self.image)
 
-        if self.ball.velocity:
+        if show_velocity and self.ball.velocity:
             self._visualize_velocity(self.ball, self.image)
 
-        if self.ball.velocity.length_squared() == 0:
+        if show_pointer and self.ball.velocity.length_squared() == 0:
             self._draw_pointer(self.ball, self.image)
 
         return self.image
@@ -55,7 +55,7 @@ class Hole(object):
                 self.score += 1
         if e.type in [pygame.USEREVENT]:
             if e.code == 'penalty':
-                self.score += 1
+                self.score += e.degree
 
     def _visualize_velocity(self, ball, surface):
         """

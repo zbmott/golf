@@ -11,6 +11,7 @@ from pygame import draw
 
 from transitions import Machine
 
+from src import constants
 from src.utils import colors
 
 
@@ -18,18 +19,25 @@ class Quit(Exception):
     pass
 
 
+class GameOver(Exception):
+    def __init__(self, surface):
+        self.surface = surface
+
+
 class Golf(object):
     STATES = [
         'home',
         'hole',
-        'score',
         'quit',
+        'game_over',
     ]
 
     TRANSITIONS = [
         {'trigger': 'next_hole', 'source': ['home', 'hole'], 'dest': 'hole', 'before': 'load_hole'},
-        {'trigger': 'end_game', 'source': 'hole', 'dest': 'score'},
+        {'trigger': 'end_game', 'source': 'hole', 'dest': 'game_over', 'before': 'render_final_score_text'},
+        {'trigger': 'die', 'source': '*', 'dest': 'game_over', 'before': 'render_death_text'},
         {'trigger': 'quit', 'source': '*', 'dest': 'quit'},
+
     ]
 
     def __init__(self, screen, course):
@@ -54,18 +62,11 @@ class Golf(object):
         self.current_score = 0
         self.scores = []
 
-    def handle_home_tick(self):
+    def home(self, clock):
         """
-        Describes how to draw the home screen. Basically all we do is render
-        some text and wait for the user to press a key or click the mouse,
+        Render text and wait for the user to press a key or click the mouse,
         at which point we start the game.
         """
-        for event in pygame.event.get():
-            if event.type in [pygame.QUIT]:
-                self.quit()
-            elif event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
-                self.next_hole()
-
         screen.fill(colors.DARKGRAY)
 
         font1 = pygame.font.Font(None, 112)
@@ -86,10 +87,19 @@ class Golf(object):
 
         pygame.display.update()
 
+        while True:
+            for event in pygame.event.get():
+                if event.type in [pygame.QUIT]:
+                    self.quit()
+                elif event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
+                    self.next_hole()
+                    return
+
+            clock.tick(constants.MAX_FPS)
+
     def load_hole(self):
         """
-        Record the current score, stop tracking the current hole's sprites,
-        and advance to the next hole.
+        Advance to the next hole and reset the score.
         """
         self.current_hole = next(self.iterable_holes)
         self.current_hole.score = 0
@@ -110,6 +120,8 @@ class Golf(object):
                         self.next_hole()
                     except StopIteration:
                         self.end_game()
+                if event.code == 'die':
+                    self.die(event.message)
 
         self.screen.fill(colors.DARKGRAY)
         self.current_hole.update()
@@ -177,37 +189,67 @@ class Golf(object):
 
         return surface
 
-    def handle_score_tick(self):
-        """
-        Draw the final score, then quit on user interaction.
-        """
-        for event in pygame.event.get():
-            if event.type in [pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
-                self.quit()
-
-        screen.fill(colors.DARKGRAY)
+    def render_final_score_text(self):
+        surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
 
         font = pygame.font.Font(None, 50)
         par = "Par: {par}".format(par=self.course.total_par)
         score = "Score: {score}".format(score=self.course.total_score)
 
         width, height = font.size(score)
-        self.screen.blit(
+        surface.blit(
             font.render(score, True, colors.WHITE),
             (640 - (width // 2), 200)
         )
 
         width, _ = font.size(par)
-        self.screen.blit(
+        surface.blit(
             font.render(par, True, colors.WHITE),
             (640 - (width // 2), 215 + height)
         )
+
+        raise GameOver(surface=surface)
+
+    def render_death_text(self, msg):
+        surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+
+        font = pygame.font.Font(None, 50)
+
+        width, height = font.size(msg)
+        surface.blit(
+            font.render(msg, True, colors.WHITE),
+            (640 - (width // 2), 215 + height)
+        )
+
+        raise GameOver(surface=surface)
+
+    def game_over(self, clock, surface=None):
+        self.current_hole.update()
+        self.current_hole.draw(show_pointer=False, show_velocity=False)
+
+        self.screen.blit(
+            self.current_hole.image,
+            (self.current_hole.origin.x, self.current_hole.origin.y)
+        )
+
+        transparency = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+        transparency.fill(colors.TRANSPARENTGRAY)
+        self.screen.blit(
+            transparency.convert_alpha(),
+            (0, 0)
+        )
+
+        if isinstance(surface, pygame.Surface):
+            self.screen.blit(
+                surface.convert_alpha(),
+                (0, 0)
+            )
 
         font = pygame.font.Font(None, 30)
         width, _ = font.size('Press any key to quit...')
         self.screen.blit(
             font.render('Press any key to quit...', True, colors.WHITE),
-            (640 - (width // 2), 230 + 5*height)
+            (640 - (width // 2), 850)
         )
 
         self.screen.blit(
@@ -217,12 +259,22 @@ class Golf(object):
 
         pygame.display.update()
 
+        while True:
+            for event in pygame.event.get():
+                if event.type in [pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
+                    self.quit()
+                    return 0
+
+            clock.tick(constants.MAX_FPS)
+
     def handle_quit_tick(self):
         pygame.quit()
         raise Quit()
 
     def __call__(self):
         self.clock = pygame.time.Clock()
+
+        self.home(self.clock)
 
         while True:
             state_handler = getattr(self, "handle_{self.state}_tick".format(self=self))
@@ -231,8 +283,10 @@ class Golf(object):
                 state_handler()
             except (Quit, pygame.error):
                 return 0
+            except GameOver as go:
+                return self.game_over(self.clock, go.surface)
 
-            self.clock.tick(60)  # Framerate capped at 60 FPS
+            self.clock.tick(constants.MAX_FPS)
 
 
 if __name__ == '__main__':

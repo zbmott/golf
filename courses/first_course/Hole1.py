@@ -12,16 +12,16 @@ Hole = BaseHole(
     'Hole #1',
     par=1,
     origin=Point(50, 50, 0),
-    ball=Point(490, 500, 0),
+    ball=Point(535, 545, 0),
     noncollidibles=LayeredDirty(
-        Text(Point(620, 225), 'Par 1', font.Font(None, 30), colors.WHITE)
+        Text(Point(515, 160), 'Par 1', font.Font(None, 30), colors.WHITE),
     ),
     collidibles=LayeredDirty(
-        Green([Point(370, 170, 0), Point(600, 170, 0), Point(600, 540, 0), Point(370, 540, 0)]),
-        Pin(Point(490, 230, 0)),
-        Wall(Point(370, 170, 0), Point(600, 170, 0), 5),
-        Wall(Point(600, 170, 0), Point(600, 540, 0), 5),
-        Wall(Point(600, 540, 0), Point(370, 540, 0), 5),
-        Wall(Point(370, 540, 0), Point(370, 170, 0), 5)
+        Green([Point(360, 190, 0), Point(700, 190, 0), Point(700, 600, 0), Point(360, 600, 0)]),
+        Pin(Point(535, 260, 0)),
+        Wall(Point(360, 190, 0), Point(700, 190, 0), 5),
+        Wall(Point(700, 190, 0), Point(700, 600, 0), 5),
+        Wall(Point(700, 600, 0), Point(360, 600, 0), 5),
+        Wall(Point(360, 600, 0), Point(360, 190, 0), 5)
     )
 )
