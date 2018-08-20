@@ -10,7 +10,7 @@ from .abstract import FrictionalSurface
 
 class Lava(FrictionalSurface):
     def __init__(self, points, *groups):
-        super().__init__(points, colors.LAVA, 0.7, *groups)
+        super().__init__(points, colors.LAVA, 0.71, *groups)
 
 #    def is_colliding_with(self, ball):
 #        return self.rect.colliderect(pygame.Rect(

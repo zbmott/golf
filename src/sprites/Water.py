@@ -12,12 +12,12 @@ class Water(FrictionalSurface):
     def __init__(self, points, *groups):
         super().__init__(points, colors.BLUE, 0.8, *groups)
 
-    def is_colliding_with(self, ball):
-        return self.rect.colliderect(pygame.Rect(
-            ball.center.x - 5,
-            ball.center.y - 5,
-            10, 10
-        ))
+    # def is_colliding_with(self, ball):
+    #     return self.rect.colliderect(pygame.Rect(
+    #         ball.center.x - 5,
+    #         ball.center.y - 5,
+    #         10, 10
+    #     ))
 
     def handle_collision(self, ball):
         """
