@@ -12,13 +12,6 @@ class Water(FrictionalSurface):
     def __init__(self, points, *groups):
         super().__init__(points, colors.BLUE, 0.8, *groups)
 
-    # def is_colliding_with(self, ball):
-    #     return self.rect.colliderect(pygame.Rect(
-    #         ball.center.x - 5,
-    #         ball.center.y - 5,
-    #         10, 10
-    #     ))
-
     def handle_collision(self, ball):
         """
         The ball collides with Water like a normal frictional surface, but
@@ -34,7 +27,7 @@ class Water(FrictionalSurface):
             ball.velocity = ball.previous_velocities[-1]
 
             vec = self.backup(ball)
-            for _ in range(5):
+            for _ in range(15):
                 self.backup_step(vec, ball)
 
             ball.stop()

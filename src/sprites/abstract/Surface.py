@@ -51,6 +51,13 @@ class Surface(sprite.DirtySprite, Collidible):
     def create_for_editor(cls, points):
         return cls(points)
 
+    def is_colliding_with(self, ball):
+        s = sprite.Sprite()
+        s.rect = ball.rect
+        s.mask = ball.surface_mask
+
+        return sprite.collide_mask(self, s)
+
     def collide_with(self, ball):
         """
         Surfaces only collide with the ball if the ball is currently moving.

@@ -2,6 +2,7 @@
 
 __author__ = 'zmott@nerdery.com'
 
+from pygame.mask import Mask
 from pygame.math import Vector2
 
 __all__ = [
@@ -11,6 +12,16 @@ __all__ = [
 
 def round_(n, base=10):
     return int(base * round(float(n) / base))
+
+
+def create_rectangular_mask(canvas_width, canvas_height, offset_x, offset_y, mask_width, mask_height):
+    m = Mask((canvas_width, canvas_height))
+
+    for x in range(offset_x, offset_x + mask_width):
+        for y in range(offset_y, offset_y + mask_height):
+            m.set_at((x, y), 1)
+
+    return m
 
 
 class Point(object):

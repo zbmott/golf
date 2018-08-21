@@ -18,7 +18,7 @@ Hole = BaseHole(
     ),
     collidibles=LayeredDirty(
         Green([Point(50, 500, 0), Point(450, 500, 0), Point(450, 700, 0), Point(50, 700, 0)]),
-        Slope([Point(200, 500, 0), Point(300, 500, 0), Point(300, 325, 0), Point(200, 325, 0)], Color(125, 0, 0, 255), Vector2(0.0, -0.125)),
+        Slope([Point(200, 500, 0), Point(300, 500, 0), Point(300, 325, 0), Point(200, 325, 0)], Color(125, 0, 0, 255), Vector2(0.0, -0.1)),
         Rough([Point(200, 325, 0), Point(200, 200, 0), Point(300, 200, 0), Point(300, 325, 0)]),
         Slope([Point(200, 200, 0), Point(200, 100, 0), Point(300, 10, 0), Point(300, 200, 0)], Color(125, 0, 0, 255), Vector2(0.0, -0.15)),
         Green([Point(300, 100, 0), Point(600, 100, 0), Point(600, 10, 0), Point(300, 10, 0)]),

@@ -7,7 +7,7 @@ from os import path
 from pygame import math, Rect
 
 from src import constants
-from src.utils import Point
+from src.utils import create_rectangular_mask, Point
 from .abstract import ImageSprite
 
 
@@ -32,6 +32,16 @@ class GolfBall(ImageSprite):
 
         self.rect.x = self.logical_position.x
         self.rect.y = self.logical_position.y
+
+        # This is a special collision mask we use for checks against surfaces.
+        # It's a little bit smaller that then the sprite-based collision mask
+        # to account for the fact that the ball is, in theory, spherical.
+        self.surface_mask = create_rectangular_mask(
+            self.rect.width,
+            self.rect.height,
+            5, 5,
+            10, 10
+        )
 
         self.previous_positions = []
         self.previous_velocities = []
