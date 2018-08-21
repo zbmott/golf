@@ -12,7 +12,7 @@ from src.utils import colors, Point
 
 
 class Hole(object):
-    def __init__(self, name, par, origin, width=1080, height=800, ball=None, **labeled_groups):
+    def __init__(self, name='untitled', par=3, origin=Point(50, 50), width=1080, height=900, ball=None, **labeled_groups):
         self.score = -1
         self.name = name
         self.par = par
@@ -21,6 +21,8 @@ class Hole(object):
         self.height = height
 
         self.image = Surface((width, height))
+
+        self.rect = pygame.Rect(*origin.as_2d_tuple(), width, height)
 
         self.groups = {'all': RenderUpdates()}
 

@@ -3,13 +3,14 @@
 
 __author__ = 'zmott@nerdery.com'
 
-import copy, sys
+import importlib, copy, sys
 from operator import attrgetter
 
 from transitions import Machine
 
 import pygame
 
+from src.models import Hole
 from src.sprites import *
 from src.utils import colors, Point, round_
 
@@ -34,6 +35,7 @@ class Editor(object):
         (98, 0): GolfBall,  # B
         (103, 0): Green,    # G
         (108, 0): Slope,    # L
+        (110, 0): Tunnel,   # N
         (112, 0): Pin,      # P
         (114, 0): Rough,    # R
         (115, 0): Sand,     # S
@@ -42,7 +44,7 @@ class Editor(object):
         (119, 0): Wall      # W
     }
 
-    def __init__(self, screen):
+    def __init__(self, screen, hole=None):
         self.screen = screen
         self.clock = pygame.time.Clock()
 
@@ -53,14 +55,13 @@ class Editor(object):
             transitions=self.TRANSITIONS,
         )
 
-        self.all = pygame.sprite.LayeredUpdates()
+        self.hole = hole or Hole()
 
-        self.current_sprite_class = Green
+        self.hole.groups['all'].add(hole.ball)
+
+        self.current_sprite_class = None if self.hole else Green
+
         self.points = []
-
-        self.canvas_origin = Point(50, 50)
-        self.canvas = pygame.Surface((1080, 900))
-        self.canvas_rect = pygame.Rect(50, 50, 1080, 900)
 
         self.orthogonal = False
         self.selection = None
@@ -71,7 +72,7 @@ class Editor(object):
         the canvas, snapped to a 10-pixel grid, and snapped to the
         x or y axis.
         """
-        where = Point(*map(round_, pygame.mouse.get_pos())) - self.canvas_origin
+        where = Point(*map(round_, pygame.mouse.get_pos())) - self.hole.origin
 
         if self.should_snap_to_x(*where.as_2d_tuple()):
             where.y = self.points[-1].y
@@ -109,7 +110,7 @@ class Editor(object):
                 pygame.quit()
                 raise Quit()
             if event.type in [pygame.MOUSEBUTTONDOWN]:
-                if self.canvas_rect.collidepoint(*event.pos):
+                if self.hole.rect.collidepoint(*event.pos):
                     self.handle_click(event)
             if event.type in [pygame.KEYDOWN]:
                 self.handle_keydown(event)
@@ -117,17 +118,17 @@ class Editor(object):
                 self.handle_keyup(event)
 
         self.screen.fill(colors.DARKGRAY)
-        self.canvas.fill(colors.BLACK)
+        self.hole.image.fill(colors.BLACK)
 
-        self.all.update()
-        self.all.draw(self.canvas)
+        self.hole.groups['all'].update()
+        self.hole.draw(show_pointer=False, show_velocity=False)
 
         if self.state == 'placing':
             self.finalize(endpoint=self._mouse_pos(), save=False)
 
         self.screen.blit(
-            self.canvas,
-            self.canvas_origin.as_2d_tuple()
+            self.hole.image,
+            self.hole.origin.as_2d_tuple()
         )
 
         self.render_segment_length(self.screen, self.points)
@@ -163,23 +164,23 @@ class Editor(object):
         target = self.selection.rect
 
         pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Upper left
-            self.canvas_origin.x + target.x - 3,
-            self.canvas_origin.y + target.y - 3,
+            self.hole.origin.x + target.x - 3,
+            self.hole.origin.y + target.y - 3,
             3, 3
         ))
         pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Upper right
-            self.canvas_origin.x + target.x + target.width,
-            self.canvas_origin.y + target.y - 3,
+            self.hole.origin.x + target.x + target.width,
+            self.hole.origin.y + target.y - 3,
             3, 3
         ))
         pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Bottom left
-            self.canvas_origin.x + target.x - 3,
-            self.canvas_origin.y + target.y + target.height,
+            self.hole.origin.x + target.x - 3,
+            self.hole.origin.y + target.y + target.height,
             3, 3
         ))
         pygame.draw.rect(surface, colors.WHITE, pygame.Rect(  # Bottom right
-            self.canvas_origin.x + target.x + target.width,
-            self.canvas_origin.y + target.y + target.height,
+            self.hole.origin.x + target.x + target.width,
+            self.hole.origin.y + target.y + target.height,
             3, 3
         ))
 
@@ -198,19 +199,20 @@ class Editor(object):
         # Raised when there aren't enough points to draw a Surface (polygon).
         except ValueError:
             return pygame.draw.aalines(
-                self.canvas, colors.RED, False,
+                self.hole.image, colors.RED, False,
                 [p.as_2d_tuple() for p in points_to_draw], 3
             )
 
         sprite.update()
 
-        self.canvas.blit(
+        self.hole.image.blit(
             sprite.image,
             (sprite.rect.x, sprite.rect.y)
         )
 
         if save:
-            self.all.add(sprite)
+            self.hole.groups['all'].add(sprite)
+            self.hole.groups['collidibles'].add(sprite)
 
     def handle_click(self, event):
         button = event.button
@@ -226,15 +228,15 @@ class Editor(object):
             else:
                 self.selection = self.select(where)
 
-        if self.state == 'placing':
+        if self.current_sprite_class is not None:
             self.points.append(where)
 
-            # Convenience logic for non-polygonal objects
-            if len(self.points) == 2:
+            if self.current_sprite_class.should_finalize(self.points):
                 self.finalize(save=True)
 
+                # Convenience logic for special cases.
                 # If we're placing a 0-D object, finish placement after the 2nd click.
-                if issubclass(self.current_sprite_class, (GolfBall, Pin)):
+                if issubclass(self.current_sprite_class, (GolfBall, Pin, Tunnel)):
                     self.finish()
 
                 # If we're placing a 1-D object, finish placement, but start placing
@@ -248,7 +250,7 @@ class Editor(object):
         This could be improved by making a 1x1 mask at that location and
         using sprite.collide_mask instead of rect.collidepoint.
         """
-        for s in sorted(self.all.sprites(), key=attrgetter('_layer'), reverse=True):
+        for s in sorted(self.hole.groups['all'].sprites(), key=attrgetter('_layer'), reverse=True):
             if s.rect.collidepoint(pos.as_2d_tuple()):
                 return s
 
@@ -293,7 +295,7 @@ class Editor(object):
         except (ValueError, TypeError, IndexError):
             pass
         else:
-            self.all.add(new)
+            self.hole.groups['all'].add(new)
             self.selection.kill()
             self.selection = new
 
@@ -309,8 +311,8 @@ from src.utils import colors, Point
 
 
 Hole = BaseHole(
-    'untitled',
-    par=3,
+    {hole.name!r},
+    par={hole.par},
     origin={origin!r},
     ball={ball_pos!r},
     noncollidibles=LayeredDirty(),
@@ -320,22 +322,26 @@ Hole = BaseHole(
 )
 """
         ball = None
-        for s in self.all.sprites():
+        for s in self.hole.groups['all'].sprites():
             if isinstance(s, GolfBall):
                 ball = s
                 break
 
-        self.all.remove(ball)
+        self.hole.groups['all'].remove(ball)
 
         with open('new_hole.py', 'w') as outfile:
             outfile.write(
                 tmpl.format(
-                    origin=self.canvas_origin,
+                    hole=self.hole,
+                    origin=self.hole.origin,
                     ball_pos=Point(
                         int(ball.logical_position.x),
                         int(ball.logical_position.y),
                     ),
-                    collidibles=(",\n" + 8*' ').join([repr(s) for s in self.all.sprites()])
+                    collidibles=(",\n" + 8*' ').join([
+                        repr(s)
+                        for s in self.hole.groups['collidibles'].sprites()
+                    ])
                 )
             )
 
@@ -356,4 +362,9 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((1180, 1000))
 
-    sys.exit(Editor(screen)())
+    try:
+        hole = importlib.import_module(sys.argv[1]).Hole
+    except ImportError:
+        hole = None
+
+    sys.exit(Editor(screen, hole=hole)())

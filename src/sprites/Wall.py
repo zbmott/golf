@@ -54,6 +54,10 @@ class Wall(DirtySprite, Collidible):
     def create_for_editor(cls, points):
         return cls(points[0], points[1])
 
+    @classmethod
+    def should_finalize(cls, points):
+        return len(points) == 2
+
     def update(self):
         draw.line(
             self.image,

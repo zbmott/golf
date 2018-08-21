@@ -26,7 +26,7 @@ class GolfBall(ImageSprite):
         self.points = [point]
         self._layer = constants.LAYER_BALL
 
-        self.velocity = math.Vector2(0, 0)
+        self._velocity = math.Vector2(0, 0)
 
         self.logical_position = Point(point.x - self.RADIUS, point.y - self.RADIUS)
 
@@ -45,6 +45,15 @@ class GolfBall(ImageSprite):
 
         self.previous_positions = []
         self.previous_velocities = []
+
+    @property
+    def velocity(self):
+        return self._velocity
+
+    @velocity.setter
+    def velocity(self, value):
+        self.previous_velocities.append(self.velocity)
+        self._velocity = value
 
     @property
     def center(self):
@@ -72,6 +81,10 @@ class GolfBall(ImageSprite):
     def create_for_editor(cls, points):
         return cls(points[-1])
 
+    @classmethod
+    def should_finalize(cls, points):
+        return len(points) == 2
+
     def update(self):
         self.logical_position.x += self.velocity.x
         self.logical_position.y += self.velocity.y
@@ -91,16 +104,16 @@ class GolfBall(ImageSprite):
 
     def strike(self, x, y):
         self.previous_positions.append(self.logical_position)
-        self.previous_velocities.append(self.velocity)
 
-        self.velocity = math.Vector2(
+        new_velocity = math.Vector2(
             (self.center.x - x) / constants.STRIKE_SCALE_FACTOR,
             (self.center.y - y) / constants.STRIKE_SCALE_FACTOR
         )
 
-        if self.velocity.length_squared() >= constants.MAX_SPEED_SQUARED:
-            self.velocity.scale_to_length(constants.MAX_SPEED)
+        if new_velocity.length_squared() >= constants.MAX_SPEED_SQUARED:
+            new_velocity.scale_to_length(constants.MAX_SPEED)
+
+        self.velocity = new_velocity
 
     def stop(self):
-        self.previous_velocities.append(self.velocity)
         self.velocity = math.Vector2(0, 0)

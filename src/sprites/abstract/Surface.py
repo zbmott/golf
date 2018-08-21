@@ -51,6 +51,10 @@ class Surface(sprite.DirtySprite, Collidible):
     def create_for_editor(cls, points):
         return cls(points)
 
+    @classmethod
+    def should_finalize(cls, points):
+        return False
+
     def is_colliding_with(self, ball):
         s = sprite.Sprite()
         s.rect = ball.rect

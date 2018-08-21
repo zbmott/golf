@@ -44,6 +44,10 @@ class Pin(ImageSprite, Collidible):
     def create_for_editor(cls, points):
         return cls(points[-1])
 
+    @classmethod
+    def should_finalize(cls, points):
+        return len(points) == 2
+
     def collide_with(self, ball):
         # If the ball is overlapping any portion of the hole,
         # give it a little push into the cup.
@@ -64,12 +68,12 @@ class Pin(ImageSprite, Collidible):
 
         # If the ball is overlapping the center of the pin, see if
         # the player sank the putt.
-        if ball.collision_rect.collidepoint(self.center.as_2d_tuple()):
+        if (ball.collision_rect.collidepoint(self.center.as_2d_tuple())
+                and ball.velocity.length_squared() <= constants.SINK_THRESHOLD):
             self.sink_putt(ball)
 
     def sink_putt(self, ball):
-        if ball.velocity.length_squared() <= constants.SINK_THRESHOLD:
-            ball.stop()
-            ball.center_on(self.center)
+        ball.stop()
+        ball.center_on(self.center)
 
-            event.post(event.Event(pygame.USEREVENT, code='hole_complete'))
+        event.post(event.Event(pygame.USEREVENT, code='hole_complete'))
