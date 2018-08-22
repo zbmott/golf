@@ -296,6 +296,7 @@ class Editor(object):
             pass
         else:
             self.hole.groups['all'].add(new)
+            self.hole.groups['collidibles'].add(new)
             self.selection.kill()
             self.selection = new
 
