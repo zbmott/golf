@@ -135,7 +135,17 @@ class Golf(object):
             (150, 900)
         )
 
+        self.screen.blit(
+            self._draw_fps(),
+            (1200, 10)
+        )
+
         pygame.display.update()
+
+    def _draw_fps(self):
+        text = "{fps} FPS".format(fps=int(self.clock.get_fps()))
+        font = pygame.font.Font(None, 18)
+        return font.render(text, True, colors.WHITE)
 
     def _draw_scores(self, size):
         """
