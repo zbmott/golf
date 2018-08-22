@@ -13,10 +13,13 @@ from .abstract import Collidible
 
 class Wall(DirtySprite, Collidible):
     def __init__(self, point1, point2, width=5, *groups):
-        super().__init__(*groups)
+        super().__init__()
+
+        self.dirty = 2
+        self._layer = constants.LAYER_WALL
+        self.add(*groups)
 
         self.points = [point1, point2]
-        self._layer = constants.LAYER_WALL
         self.width = width
 
         # This sprite's origin on the application's screen.

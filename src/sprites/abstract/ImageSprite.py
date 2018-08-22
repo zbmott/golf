@@ -13,6 +13,8 @@ class ImageSprite(DirtySprite):
     def __init__(self, *groups):
         super().__init__(*groups)
 
+        self.dirty = 2
+
         self.image = image.load(self.IMAGE_PATH)
         self.image.convert_alpha()
 

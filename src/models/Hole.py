@@ -4,7 +4,7 @@ __author__ = 'zmott@nerdery.com'
 
 import pygame
 from pygame import draw, math, mouse, Surface
-from pygame.sprite import RenderUpdates
+from pygame.sprite import LayeredDirty
 
 from src import constants
 from src.sprites import GolfBall
@@ -24,7 +24,7 @@ class Hole(object):
 
         self.rect = pygame.Rect(*origin.as_2d_tuple(), width, height)
 
-        self.groups = {'all': RenderUpdates()}
+        self.groups = {'all': LayeredDirty()}
 
         for label, group in labeled_groups.items():
             self.groups[label] = group

@@ -21,10 +21,11 @@ class GolfBall(ImageSprite):
     STRIKE_SCALE_FACTOR = 7.5
 
     def __init__(self, point, *groups):
-        super().__init__(*groups)
+        super().__init__()
 
         self.points = [point]
         self._layer = constants.LAYER_BALL
+        self.add(*groups)
 
         self._velocity = math.Vector2(0, 0)
 
@@ -93,8 +94,6 @@ class GolfBall(ImageSprite):
         # nearest its logical position.
         self.rect.x = int(self.logical_position.x)
         self.rect.y = int(self.logical_position.y)
-
-        self.dirty = 1
 
     def set_logical_pos(self, point):
         self.logical_position = point

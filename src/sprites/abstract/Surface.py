@@ -11,9 +11,11 @@ from .Collidible import Collidible
 
 class Surface(sprite.DirtySprite, Collidible):
     def __init__(self, points, color, *groups):
-        super().__init__(*groups)
+        super().__init__()
 
+        self.dirty = 2
         self._layer = constants.LAYER_GROUND
+        self.add(*groups)
 
         self.points = points
         self.origin = Point(
