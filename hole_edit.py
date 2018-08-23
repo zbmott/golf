@@ -35,13 +35,15 @@ class Editor(object):
         (98, 0): GolfBall,  # B
         (103, 0): Green,    # G
         (108, 0): Slope,    # L
+        (109, 0): Money,    # M
         (110, 0): Tunnel,   # N
         (112, 0): Pin,      # P
         (114, 0): Rough,    # R
         (115, 0): Sand,     # S
         (116, 0): Water,    # T
         (118, 0): Lava,     # V
-        (119, 0): Wall      # W
+        (119, 0): Wall,     # W
+        (121, 0): Paywall,  # Y
     }
 
     def __init__(self, screen, hole=None):

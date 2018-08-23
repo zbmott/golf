@@ -31,7 +31,7 @@ Hole = BaseHole(
         Green([Point(470, 460, 0), Point(130, 460, 0), Point(130, 310, 0), Point(470, 310, 0)]),
         Rough([Point(470, 390, 0), Point(470, 190, 0), Point(560, 190, 0), Point(560, 390, 0)]),
         Water([Point(560, 390, 0), Point(560, 350, 0), Point(650, 350, 0), Point(650, 390, 0)]),
-        Slope([Point(650, 350, 0), Point(650, 310, 0), Point(720, 310, 0), Point(720, 230, 0), Point(560, 230, 0), Point(560, 350, 0)], Color(200, 0, 0, 255), Vector2(-0.25, 0.0)),
+        Slope([Point(650, 350, 0), Point(650, 310, 0), Point(720, 310, 0), Point(720, 230, 0), Point(560, 230, 0), Point(560, 350, 0)], Color(200, 0, 0, 255), Vector2(-0.25, 0.45)),
         Sand([Point(130, 310, 0), Point(130, 230, 0), Point(290, 230, 0), Point(290, 310, 0)]),
         Slope([Point(470, 310, 0), Point(470, 230, 0), Point(290, 230, 0), Point(290, 310, 0)], Color(200, 0, 0, 255), Vector2(0.2, 0.0)),
         Green([Point(130, 230, 0), Point(130, 130, 0), Point(290, 130, 0), Point(290, 230, 0)]),
@@ -57,6 +57,7 @@ Hole = BaseHole(
         Wall(Point(130, 30, 0), Point(130, 730, 0), 5),
         Wall(Point(130, 730, 0), Point(880, 730, 0), 5),
         Wall(Point(880, 730, 0), Point(880, 30, 0), 5),
-        Wall(Point(880, 30, 0), Point(130, 30, 0), 5)
+        Wall(Point(880, 30, 0), Point(130, 30, 0), 5),
+        Money(Point(510, 290)),
     )
 )

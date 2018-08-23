@@ -10,6 +10,12 @@ from .abstract import Surface as SpriteSurface
 
 class Slope(SpriteSurface):
     def __init__(self, points, color, vector, *groups):
+        # color = (
+        #     int(255 * vector.x) % 255,
+        #     0,
+        #     int(255 * vector.y) % 255
+        # )
+
         super().__init__(points, color, *groups)
         self.vector = vector
 

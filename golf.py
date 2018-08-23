@@ -90,10 +90,9 @@ class Golf(object):
         while True:
             for event in pygame.event.get():
                 if event.type in [pygame.QUIT]:
-                    self.quit()
+                    return self.quit()
                 elif event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
-                    self.next_hole()
-                    return
+                    return self.next_hole()
 
             clock.tick(constants.MAX_FPS)
 
@@ -101,7 +100,13 @@ class Golf(object):
         """
         Advance to the next hole and reset the score.
         """
-        self.current_hole = next(self.iterable_holes)
+        next_hole = next(self.iterable_holes)
+
+        # Funds carry over from previous holes.
+        if self.current_hole is not None:
+            next_hole.ball.funds = self.current_hole.ball.funds
+
+        self.current_hole = next_hole
         self.current_hole.score = 0
 
     def handle_hole_tick(self):
@@ -130,22 +135,29 @@ class Golf(object):
             (self.current_hole.origin.x, self.current_hole.origin.y)
         )
 
+        if self.current_hole and self.current_hole.ball.funds > 0:
+            msg = "${ball.funds!r}".format(ball=self.current_hole.ball)
+            self.screen.blit(
+                self._render_text(msg, size=28),
+                (25, 25),
+            )
+
+        fps = "{fps} FPS".format(fps=int(self.clock.get_fps()))
+        self.screen.blit(
+            self._render_text(fps),
+            (1200, 10),
+        )
+
         self.screen.blit(
             self._draw_scores(30),
             (150, 900)
         )
 
-        self.screen.blit(
-            self._draw_fps(),
-            (1200, 10)
-        )
-
         pygame.display.update()
 
-    def _draw_fps(self):
-        text = "{fps} FPS".format(fps=int(self.clock.get_fps()))
-        font = pygame.font.Font(None, 18)
-        return font.render(text, True, colors.WHITE)
+    def _render_text(self, text, size=18, color=colors.WHITE):
+        font = pygame.font.Font(None, size)
+        return font.render(text, True, color)
 
     def _draw_scores(self, size):
         """

@@ -18,11 +18,11 @@ class GolfBall(ImageSprite):
         'assets',
         'golfball_20x20.png'
     )
-    STRIKE_SCALE_FACTOR = 7.5
 
-    def __init__(self, point, *groups):
+    def __init__(self, point, funds=0, *groups):
         super().__init__()
 
+        self.funds = funds
         self.points = [point]
         self._layer = constants.LAYER_BALL
         self.add(*groups)

@@ -3,7 +3,7 @@
 __author__ = 'zmott@nerdery.com'
 
 
-from pygame import draw, mask, math, sprite, Surface
+from pygame import draw, mask, math, Surface
 from pygame.sprite import DirtySprite
 
 from src import constants
@@ -47,10 +47,10 @@ class Wall(DirtySprite, Collidible):
         self.mask = mask.from_surface(self.image)
 
     def __repr__(self):
-        return "Wall({p1!r}, {p2!r}, {self.width!r})".format(
+        return "{self.__class__.__name__}({p1!r}, {p2!r}, {self.width!r})".format(
+            self=self,
             p1=self.point1 + self.origin,
             p2=self.point2 + self.origin,
-            self=self,
         )
 
     @classmethod
