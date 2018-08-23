@@ -228,7 +228,7 @@ class Editor(object):
             else:
                 self.selection = self.select(where)
 
-        if self.current_sprite_class is not None:
+        if self.current_sprite_class is not None and self.state == 'placing':
             self.points.append(where)
 
             if self.current_sprite_class.should_finalize(self.points):
@@ -236,7 +236,7 @@ class Editor(object):
 
                 # Convenience logic for special cases.
                 # If we're placing a 0-D object, finish placement after the 2nd click.
-                if issubclass(self.current_sprite_class, (GolfBall, Pin, Tunnel)):
+                if issubclass(self.current_sprite_class, (GolfBall, Money, Pin, Tunnel)):
                     self.finish()
 
                 # If we're placing a 1-D object, finish placement, but start placing
@@ -262,8 +262,10 @@ class Editor(object):
         if event.key == 115 and event.mod > 0:  # Cmd/Ctrl + S
             self.save()
 
-        if self.state == 'placing' and event.key == 32:  # Spacebar
-            self.finalize(save=True)
+        if self.state == 'placing' and event.key == 32:  # Spacebar:
+            if self.current_sprite_class.should_finalize(self.points):
+                self.finalize(save=True)
+
             self.finish()
 
         if event.key in {303, 304}:  # Shift
