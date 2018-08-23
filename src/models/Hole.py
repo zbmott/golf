@@ -30,7 +30,7 @@ class Hole(object):
             self.groups[label] = group
             self.groups['all'].add(*group.sprites())
 
-        self.ball = GolfBall(ball, self.groups['all'])
+        self.ball = GolfBall(ball, self.groups['all']) if ball else None
 
     def update(self):
         self.groups['all'].update()

@@ -55,11 +55,9 @@ class Editor(object):
             transitions=self.TRANSITIONS,
         )
 
-        self.hole = hole or Hole()
+        self.hole = hole or Hole(collidibles=pygame.sprite.LayeredDirty())
 
-        self.hole.groups['all'].add(hole.ball)
-
-        self.current_sprite_class = None if self.hole else Green
+        self.current_sprite_class = None if hole else Green
 
         self.points = []
 
@@ -342,6 +340,7 @@ Hole = BaseHole(
                     collidibles=(",\n" + 8*' ').join([
                         repr(s)
                         for s in self.hole.groups['collidibles'].sprites()
+                        if not isinstance(s, GolfBall)
                     ])
                 )
             )
@@ -365,7 +364,7 @@ if __name__ == '__main__':
 
     try:
         hole = importlib.import_module(sys.argv[1]).Hole
-    except ImportError:
+    except(ImportError, IndexError):
         hole = None
 
     sys.exit(Editor(screen, hole=hole)())

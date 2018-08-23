@@ -18,3 +18,5 @@ class Text(DirtySprite):
             self.image.get_width(),
             self.image.get_height()
         )
+
+        self.dirty = 2
