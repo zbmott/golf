@@ -2,6 +2,7 @@
 
 __author__ = 'zmott@nerdery.com'
 
+import __main__
 
 from os import path
 
@@ -11,7 +12,7 @@ from .abstract import Collidible, ImageSprite
 
 class Money(ImageSprite, Collidible):
     IMAGE_PATH = path.join(
-        path.dirname(path.dirname(path.dirname(__file__))),
+        path.dirname(__main__.__file__),
         'assets',
         'coin_15x15.png',
     )

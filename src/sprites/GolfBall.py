@@ -2,6 +2,8 @@
 
 __author__ = 'zmott@nerdery.com'
 
+import __main__
+
 from os import path
 
 from pygame import math, Rect
@@ -14,7 +16,7 @@ from .abstract import ImageSprite
 class GolfBall(ImageSprite):
     RADIUS = 10
     IMAGE_PATH = path.join(
-        path.dirname(path.dirname(path.dirname(__file__))),
+        path.dirname(__main__.__file__),
         'assets',
         'golfball_20x20.png'
     )

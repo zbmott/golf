@@ -2,3 +2,5 @@
 golf.iml
 .idea
 .pyc
+build/
+dist/
