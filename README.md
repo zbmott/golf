@@ -3,6 +3,10 @@ Golf is a bad Python implementation of minigolf.
 Part of the fun is that it's not very good and weird things happen.
 
 ## Installation and Usage
+### OS X ###
+Download Golf [here](https://drive.google.com/open?id=14csaWaayisoO630M6l265Kx3ij6ntdtQ).
+
+### Build from Source ###
 1. Clone the repository.
 2. Install the dependencies:
 ```
@@ -32,20 +36,22 @@ Here's how it works:
 - You use the keyboard to set a minigolf element to your palette.
 - Here are the available minigolf elements:
   - Golf(B)all
-  - (P)in
   - (G)reen
+  - La(v)a
+  - (M)oney
+  - Pa(y)wall
+  - (P)in
   - (R)ough
   - (S)and
   - S(l)ope
   - (T)unnel
   - (W)all
   - Wa(t)er
-  - La(v)a
 - A hole must have one `GolfBall` and at least one `Pin`.
 - `left-click` to start placing the element on your palette.
-- For 1-D elements (`GolfBall`, `Pin`), click a second time to confirm your placement
+- For 1-D elements (`GolfBall`, `Money`, `Pin`), click a second time to confirm your placement
 - When placing a `Tunnel`, you have to click an extra time to indicate the `Tunnel's` exit.
-- For linear elements (`Wall`), click a second time to finish placing an element. Subsequent clicks will create a new element using the previous click as the starting point. Press `spacebar` or `Esc` when you're done placing linear elements.
+- For linear elements (`Paywall`, `Wall`), click a second time to finish placing an element. Subsequent clicks will create a new element using the previous click as the starting point. Press `spacebar` or `Esc` when you're done placing linear elements.
 - For polygonal elements (`Green`, `Lava`, `Rough`, `Sand`, `Slope`, `Water`), click will place another point at the pointer's current position. Press `spacebar` to finish placing a polygonal element.
 - While placing a linear or polygonal element, you can hold `shift` to align your next point with the previous point along the X or Y axis, or place the next point at an approximate 45-degree angle to the previous point.
 - Pressing `Esc` between clicks will cancel the element you're trying to place and clear your palette.
