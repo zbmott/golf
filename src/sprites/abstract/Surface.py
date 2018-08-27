@@ -55,7 +55,7 @@ class Surface(sprite.DirtySprite, Collidible):
 
     @classmethod
     def should_finalize(cls, points):
-        return False
+        return len(points) > 2
 
     def is_colliding_with(self, ball):
         s = sprite.Sprite()

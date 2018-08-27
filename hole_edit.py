@@ -12,6 +12,7 @@ import pygame
 
 from src.models import Hole
 from src.sprites import *
+from src.sprites.abstract import Surface
 from src.utils import colors, Point, round_
 
 
@@ -231,7 +232,8 @@ class Editor(object):
         if self.current_sprite_class is not None and self.state == 'placing':
             self.points.append(where)
 
-            if self.current_sprite_class.should_finalize(self.points):
+            if (self.current_sprite_class.should_finalize(self.points)
+                    and not issubclass(self.current_sprite_class, Surface)):
                 self.finalize(save=True)
 
                 # Convenience logic for special cases.
