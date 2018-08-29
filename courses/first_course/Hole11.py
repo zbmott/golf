@@ -48,6 +48,7 @@ Hole = BaseHole(
         Wall(Point(1050, 850, 0), Point(50, 850, 0), 10),
         Wall(Point(50, 850, 0), Point(50, 50, 0), 10),
         Wall(Point(50, 450, 0), Point(500, 450, 0), 10),
-        Wall(Point(500, 450, 0), Point(500, 50, 0), 10)
+        Wall(Point(500, 450, 0), Point(500, 50, 0), 10),
+        Money(Point(75, 75)),
     )
 )

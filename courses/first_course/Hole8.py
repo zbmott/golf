@@ -22,6 +22,7 @@ Hole = BaseHole(
         Rough([Point(650, 50, 0), Point(800, 50, 0), Point(800, 200, 0), Point(650, 200, 0)]),
         Lava([Point(250, 580, 0), Point(250, 200, 0), Point(800, 200, 0), Point(800, 50, 0), Point(900, 50, 0), Point(900, 580, 0)]),
         Pin(Point(730, 125, 0)),
+        Money(Point(225, 175)),
         Wall(Point(50, 50, 0), Point(900, 50, 0), 5),
         Wall(Point(900, 50, 0), Point(900, 580, 0), 5),
         Wall(Point(900, 580, 0), Point(50, 580, 0), 5),

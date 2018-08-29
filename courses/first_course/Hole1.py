@@ -19,6 +19,7 @@ Hole = BaseHole(
     collidibles=LayeredDirty(
         Green([Point(360, 190, 0), Point(700, 190, 0), Point(700, 600, 0), Point(360, 600, 0)]),
         Pin(Point(535, 260, 0)),
+        Money(Point(529, 215)),
         Wall(Point(360, 190, 0), Point(700, 190, 0), 5),
         Wall(Point(700, 190, 0), Point(700, 600, 0), 5),
         Wall(Point(700, 600, 0), Point(360, 600, 0), 5),

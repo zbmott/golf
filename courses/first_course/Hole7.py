@@ -31,6 +31,7 @@ Hole = BaseHole(
         Rough([Point(900, 100, 0), Point(950, 100, 0), Point(950, 500, 0), Point(900, 500, 0)]),
         Water([Point(950, 100, 0), Point(1070, 100, 0), Point(1070, 500, 0), Point(950, 500, 0)]),
         Pin(Point(830, 250, 0)),
+        Money(Point(820, 440)),
         Wall(Point(50, 500, 0), Point(200, 500, 0), 5),
         Wall(Point(200, 500, 0), Point(200, 100, 0), 5),
         Wall(Point(300, 10, 0), Point(200, 100, 0),  5),

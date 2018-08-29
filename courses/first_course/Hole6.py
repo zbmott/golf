@@ -26,6 +26,7 @@ Hole = BaseHole(
         Slope([Point(700, 550, 0), Point(700, 150, 0), Point(610, 150, 0), Point(610, 550, 0)], Color(125, 0, 0, 255), Vector2(-0.15, 0.0)),
         Rough([Point(550, 50, 0), Point(700, 50, 0), Point(700, 150, 0), Point(550, 150)]),
         Pin(Point(200, 100, 0)),
+        Money(Point(640, 650)),
         Wall(Point(150, 50, 0), Point(700, 50, 0), 5),
         Wall(Point(700, 50, 0), Point(700, 700, 0), 5),
         Wall(Point(700, 700, 0), Point(150, 700, 0), 5),

@@ -50,6 +50,6 @@ Hole = BaseHole(
         Wall(Point(210, 340, 0), Point(760, 340, 0), 5),
         Wall(Point(760, 340, 0), Point(760, 740, 0), 5),
         Wall(Point(760, 740, 0), Point(210, 740, 0), 5),
-        Wall(Point(210, 740, 0), Point(210, 340, 0), 5)
+        Wall(Point(210, 740, 0), Point(210, 340, 0), 5),
     )
 )

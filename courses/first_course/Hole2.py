@@ -20,6 +20,7 @@ Hole = BaseHole(
         Green([Point(440, 210, 0), Point(540, 210, 0), Point(540, 510, 0), Point(640, 510, 0), Point(640, 630, 0), Point(340, 630, 0), Point(340, 510, 0), Point(440, 510, 0)]),
         Rough([Point(440, 210, 0), Point(340, 210, 0), Point(340, 90, 0), Point(640, 90, 0), Point(640, 210, 0)]),
         Pin(Point(600, 150, 0)),
+        Money(Point(380, 145)),
         Wall(Point(340, 90, 0), Point(640, 90, 0), 5),
         Wall(Point(640, 90, 0), Point(640, 210, 0), 5),
         Wall(Point(640, 210, 0), Point(540, 210, 0), 5),
